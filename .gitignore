@@ -1,9 +1,40 @@
-node_modules
-artifacts
-cache
-coverage
-coverage.json
-typechain-types
-ignition/deployments
-
+# ===== Secrets : ne JAMAIS commiter =====
+# Variables d'environnement (clés privées, URL RPC avec clé d'API, etc.)
 .env
+.env.*
+!.env.example
+# Clés et portefeuilles
+*.pem
+*.key
+*.p12
+*.keystore
+keystore/
+wallet*.json
+secrets*.json
+mnemonic*.txt
+
+# ===== Dépendances =====
+node_modules/
+
+# ===== Hardhat (fichiers générés) =====
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+# Déploiements locaux : propres à chaque machine (chaîne 31337)
+ignition/deployments/
+
+# ===== Frontend (Vite) =====
+frontend/dist/
+frontend/.vite/
+
+# ===== Logs =====
+*.log
+npm-debug.log*
+
+# ===== Système et éditeurs =====
+.DS_Store
+Thumbs.db
+.idea/
+*.swp

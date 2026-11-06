@@ -162,6 +162,8 @@ Pour que vos amis ou vous-même puissiez tester l'interface avec MetaMask, voici
 Lorsque vous lancez `npm run node`, Hardhat affiche 20 comptes avec leurs clés privées.
 Voici les 3 premiers comptes standard générés par Hardhat :
 
+> ⚠️ **Clés de test publiques.** Ces clés sont identiques pour tous les utilisateurs de Hardhat dans le monde et sont publiées dans sa documentation. Elles ne servent **que** sur le réseau local 31337. N'envoyez **jamais** de vrais fonds à ces adresses : des robots les vident en quelques secondes sur les vrais réseaux. Ne mettez jamais dans ce dépôt une clé privée qui ne fait pas partie de cette liste.
+
 #### Compte #0 (Utile comme Créateur de Projet) :
 - **Adresse :** `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
 - **Clé privée :** `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80`
