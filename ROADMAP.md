@@ -1,4 +1,4 @@
-# Roadmap — Crowdfunding DApp
+# Roadmap — Plateforme de crowdfunding sur blockchain
 
 > **Livraison : dimanche 8 novembre 2026** · Équipe de 4 · Mettre à jour ce fichier à chaque tâche terminée (`[ ]` → `[x]`) via une Pull Request.
 

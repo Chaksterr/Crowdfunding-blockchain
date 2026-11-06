@@ -844,7 +844,7 @@ Les champs marqués `indexed` sont recherchables sur la blockchain (filtres). Le
 ## 15. Structure complète du projet
 
 ```
-crowdfunding-dapp/
+plateforme-crowdfunding-blockchain/
 │
 ├── contracts/                          # Code Solidity
 │   ├── Crowdfunding.sol                # Fabrique (41 lignes)

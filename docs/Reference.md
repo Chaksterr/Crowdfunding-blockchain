@@ -240,7 +240,7 @@ One `Project` per campaign isolates funds: a bug or attack on one campaign canno
 ## 7. Repository structure and composition of every file
 
 ```
-crowdfunding-dapp/
+plateforme-crowdfunding-blockchain/
 ├── contracts/
 │   ├── Project.sol
 │   ├── Crowdfunding.sol
@@ -268,7 +268,7 @@ Generated and git-ignored: `node_modules/`, `artifacts/`, `cache/`, `coverage/`,
 
 | File | Composition and role |
 |---|---|
-| `package.json` | Project name `crowdfunding-dapp`. Dev dependencies: `hardhat@^2.22.0` and `@nomicfoundation/hardhat-toolbox@^5.0.0`. npm scripts: `compile`, `test`, `coverage`, `node`, `deploy`, `deploy:reset`, `ff`, `simulate`. |
+| `package.json` | Project name `plateforme-crowdfunding-blockchain`. Dev dependencies: `hardhat@^2.22.0` and `@nomicfoundation/hardhat-toolbox@^5.0.0`. npm scripts: `compile`, `test`, `coverage`, `node`, `deploy`, `deploy:reset`, `ff`, `simulate`. |
 | `hardhat.config.js` | Imports the Toolbox. Solidity version `0.8.24`. Network `localhost` with URL `http://127.0.0.1:8545` and chain ID `31337`. |
 | `.gitignore` | Excludes generated folders and `.env`. |
 | `README.md` | Entry point: prerequisites, install, deploy, demo tools, folder map, links to `docs/`. |
@@ -621,7 +621,7 @@ Empty at start; creation emits `ProjectCreated`; the project's creator equals th
 
 ```bash
 git clone <repository-url>
-cd crowdfunding-dapp
+cd plateforme-crowdfunding-blockchain
 npm install
 npm run compile
 npm test
