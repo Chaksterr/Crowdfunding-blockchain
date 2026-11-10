@@ -13,9 +13,9 @@ Application décentralisée de financement participatif. Un créateur lance une 
 | Phase | Contenu | Responsable | État |
 | --- | --- | --- | --- |
 | 1 | Smart contracts et sécurité | Étudiant 1 | ✅ Terminé |
-| 2 | Interface web complète (React, Tailwind, MetaMask, ethers.js, Redux) | Étudiant 3 | ⏳ À faire |
-| 2 | Tests, déploiement, données de démo | Étudiant 2 | ⏳ À faire |
-| 2 | Recette, multi-PC, guide MetaMask, préparation de la démo | Étudiant 4 | ⏳ À faire |
+| 2 | Interface web complète (React, Tailwind, MetaMask, ethers.js, Redux) | Étudiant 3 | ✅ Terminé |
+| 2 | Tests, déploiement, données de démo | Étudiant 2 | ✅ Terminé |
+| 2 | Recette, multi-PC, guide MetaMask, préparation de la démo | Étudiant 4 | 🟡 Recette manuelle à faire |
 | 3 | Rapport, présentation, répétition de la démo | **Tous** | ⏳ À faire |
 
 
@@ -341,7 +341,7 @@ contracts/          Crowdfunding.sol, Project.sol (+ contracts/test/ : contrats 
 test/               tests Mocha/Chai
 ignition/modules/   déploiement Hardhat Ignition
 scripts/            simulate, fastForward (ff), syncAbi (sync)
-frontend/src/       abi/ + deployed.json (générés) — application React à venir
+frontend/src/       application React (Vite) : pages, composants, couche web3 + abi/ et deployed.json
 docs/               commun/ (cahier des charges, rapport, présentation) + etudiant1-smart-contracts/
 ```
 

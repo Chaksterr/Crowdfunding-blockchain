@@ -234,13 +234,89 @@ Le script avance l'horloge de 700 secondes pour clôturer les deux campagnes cou
 
 ## 6. Interface web
 
-> Cette section est complétée après l'implémentation du frontend (phase 2).
+L'interface est une application **React 18** construite avec **Vite 5**, stylée avec **Tailwind CSS 3**, routée avec **React Router 6** et alimentée par **ethers.js v6**. L'état du portefeuille est géré par **Redux Toolkit**.
+
+### 6.1 Structure
+
+```text
+frontend/src/
+  abi/                 ABI copiées par npm run sync
+  components/          Layout, Header, WalletButton, ProjectCard, ProgressBar,
+                       ToastProvider, CopyAddress, ErrorBoundary
+  components/ui/       Button, Card, Badge, Field, Alert, EmptyState, PageHeader, Spinner
+  hooks/               useWallet, useAsyncData, useTransaction, useChainEvents
+  pages/               HomePage, CreatePage, ProjectPage, MyContributionsPage, NotFoundPage
+  store/               walletSlice (compte, chaîne, solde, statut)
+  web3/                provider, contracts, projects, format, errors
+```
+
+### 6.2 Couche Web3
+
+Deux fournisseurs coexistent :
+
+- `JsonRpcProvider` sur `VITE_RPC_URL` (par défaut `http://127.0.0.1:8545`) pour toutes les lectures. Il permet de consulter les campagnes **sans MetaMask**.
+- `BrowserProvider(window.ethereum)` pour les écritures. `getSigner()` n'est appelé qu'au moment d'une transaction.
+
+La couche `web3/projects.js` expose des fonctions pures et testables :
+
+| Fonction | Rôle |
+| --- | --- |
+| `loadProjects()` | liste les adresses de la fabrique puis lit chaque campagne en parallèle (`Promise.allSettled`) |
+| `loadProject(address, account)` | détail, solde, donateurs triés, demandes, contribution et votes du compte |
+| `createProject(...)` | conversion ETH → wei, durée minutes → secondes, parse de `ProjectCreated` |
+| `donate(...)` | `contribute({ value })` avec validation du montant |
+| `createWithdrawRequest`, `voteWithdrawRequest`, `withdrawRequestedAmount`, `refund` | actions du cycle de vie |
+
+Les montants restent des `bigint` jusqu'à l'affichage : aucun `Number()` n'est appliqué aux wei. Le formatage (`formatEth`, `parseEth`, `formatPercent`) utilise `Intl` en français et accepte la virgule décimale.
+
+### 6.3 Gestion du portefeuille
+
+Le slice Redux contient `{ status, account, chainId, balance, error }`. Au montage, `eth_accounts` est appelé silencieusement : si MetaMask est déjà autorisé, l'adresse est restaurée ; sinon l'application reste en lecture seule. Les événements `accountsChanged` et `chainChanged` mettent à jour l'état, et un bandeau propose de basculer sur la chaîne `31337` en cas de mauvais réseau. Sans MetaMask, le bouton devient « Installer MetaMask » et un message explique la lecture seule.
+
+### 6.4 Pages et parcours
+
+- **Accueil** : statistiques globales, grille de cartes (titre, statut, progression, collecté/objectif, donateurs, date limite, temps restant), états chargement/erreur/vide, actualisation manuelle, abonnement à `ProjectCreated` et polling de secours.
+- **Créer** : formulaire validé côté client (titre 3–80, description 10–500, objectif > 0, minimum > 0 et ≤ objectif, durée 1–10 080 minutes), récapitulatif, blocage si le portefeuille n'est pas connecté ou si le réseau est incorrect, redirection vers le détail après confirmation.
+- **Détail** : en-tête avec badge d'état, adresses copiables, date limite et temps restant ; métriques (objectif, collecté, solde du contrat, minimum, donateurs, demandes) ; description ; formulaire de don avec montants rapides ; liste des donateurs ; demandes de retrait avec barre d'approbation ; boutons Voter/Retirer selon le rôle et le quorum ; carte de remboursement si la campagne a échoué ; abonnement aux cinq événements du contrat et polling de 15 s.
+- **Mes contributions** : liste les campagnes où `contributions(compte) > 0`, avec le montant personnel et le statut. Une contribution remboursée disparaît de la liste, conformément au contrat.
+
+### 6.5 Gestion des erreurs et accessibilité
+
+Les 20 messages `require` du contrat sont traduits en français dans `web3/errors.js`, ainsi que le refus MetaMask (code 4001), les fonds insuffisants et l'absence de RPC. Les transactions affichent un état `pending`, désactivent le bouton et rafraîchissent les données après confirmation. Les toasts sont accessibles (`aria-live`, fermeture au clavier), les formulaires associent label, hint et erreur (`aria-invalid`, `aria-describedby`), les barres de progression exposent `role="progressbar"` et les pages restent utilisables à 360 px.
+
+### 6.6 Tests
+
+Le frontend utilise **Vitest**, **Testing Library** et **jsdom** :
+
+```text
+6 fichiers, 55 tests
+errors 8 · format 23 · projects 13 · ProjectCard 3 · HomePage 3 · ProjectPage 5
+```
+
+Les tests couvrent le formatage, le mapping d'erreurs, la couche de données (avec contrats mockés) et la visibilité des actions selon le statut, le rôle et la contribution. Le build de production passe (228 modules) et la CI exécute `npm test` puis `npm run build` lorsque `frontend/package.json` existe.
 
 ---
 
 ## 7. Recette et validation
 
-> Cette section est complétée après la recette des scénarios A à F. Voir `docs/commun/RECETTE.md`.
+La fiche détaillée est dans `docs/commun/RECETTE.md`. Les scénarios A à F sont rejouables avec les comptes Hardhat #0 à #3.
+
+| Scénario | Vérification | Résultat |
+| --- | --- | --- |
+| A — succès, vote, retrait | 3 dons de 2 ETH, demande de 4 ETH, 2 votes sur 3, retrait | Validé par `npm run simulate` et les tests de contrat ; parcours UI couvert par les tests de `ProjectPage` |
+| B — échec, remboursement | objectif 50 ETH, dons 1 + 2 ETH, deux remboursements | Validé par `npm run simulate` ; contrat vidé, double remboursement refusé |
+| C — don invalide | sous le minimum, après la date limite | Refusé par `contribute()` avec messages traduits |
+| D — quorum insuffisant | 1 vote sur 3 | Refusé par `withdrawRequestedAmount()` |
+| E — doubles actions | double vote, double remboursement, non-créateur | Refusés par les `require` et les mappings |
+| F — sans MetaMask | lecture des campagnes, écriture masquée | Lecture via `JsonRpcProvider`, boutons d'écriture conditionnés par `isConnected` |
+
+La vérification automatisée repose sur 47 tests de contrat (100 % de couverture) et 55 tests frontend. La recette manuelle dans un navigateur avec MetaMask reste à exécuter sur les quatre postes de l'équipe ; elle est décrite pas à pas dans `RECETTE.md` et ne peut pas être automatisée sans navigateur dans l'environnement de développement utilisé.
+
+### 7.1 Limites de la validation
+
+- Les tests frontend mockent la couche contrats : ils vérifient le comportement de l'interface, pas la signature réelle d'une transaction MetaMask.
+- Le multi-PC (`--hostname 0.0.0.0` + `--host`) est documenté mais n'a pas été mesuré dans cet environnement.
+- Les captures d'écran et la vidéo de secours restent à produire par l'équipe.
 
 ---
 
