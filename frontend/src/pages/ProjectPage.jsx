@@ -1,22 +1,30 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { isAddress, parseEther } from 'ethers';
+import { isAddress } from 'ethers';
 
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import ConfirmationState from '../components/ConfirmationState';
+import DonationPresets from '../components/DonationPresets';
 import EmptyState from '../components/ui/EmptyState';
+import Faq from '../components/Faq';
 import Field from '../components/ui/Field';
 import Alert from '../components/ui/Alert';
 import CampaignBanner from '../components/CampaignBanner';
+import Countdown from '../components/Countdown';
+import CountUp from '../components/CountUp';
 import DonorAvatars from '../components/DonorAvatars';
 import CopyAddress from '../components/CopyAddress';
 import ProgressBar from '../components/ProgressBar';
+import SigningPreview from '../components/SigningPreview';
 import { useToast } from '../components/ToastProvider';
 import { useAsyncData } from '../hooks/useAsyncData';
 import { useProjectEvents } from '../hooks/useChainEvents';
+import { useIsMobile } from '../hooks/useMediaQuery';
 import { useTransaction } from '../hooks/useTransaction';
 import { useWallet } from '../hooks/useWallet';
+import { CHAIN_ID } from '../config';
 import { getSigner } from '../web3/provider';
 import {
   createWithdrawRequest,
@@ -27,17 +35,14 @@ import {
   withdrawRequestedAmount,
 } from '../web3/projects';
 import {
-  ethInputValue,
   formatDeadline,
   formatEth,
+  formatEthNumber,
   formatPercent,
   parseEth,
-  timeLeftLabel,
+  plural,
+  remainingLabel,
 } from '../web3/format';
-
-function secondsLeft(deadline) {
-  return Math.max(0, Number(deadline) - Math.floor(Date.now() / 1000));
-}
 
 function Metric({ label, value, hint }) {
   return (
@@ -45,7 +50,9 @@ function Metric({ label, value, hint }) {
       <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">
         {label}
       </dt>
-      <dd className="mt-1 text-base font-semibold text-slate-900">{value}</dd>
+      <dd className="mt-1 text-base font-semibold tabular-nums text-slate-900">
+        {value}
+      </dd>
       {hint ? <p className="mt-0.5 text-xs text-slate-500">{hint}</p> : null}
     </div>
   );
@@ -72,27 +79,77 @@ function DonateCard({ project, onDone }) {
     useWallet();
   const toast = useToast();
   const tx = useTransaction();
-  const [amount, setAmount] = useState('');
+  // Le deuxième préréglage (0,5 ETH) est présélectionné.
+  const [amount, setAmount] = useState('0,5');
   const [fieldError, setFieldError] = useState('');
+  const [confirmedAmount, setConfirmedAmount] = useState(null);
+  const amountRef = useRef(null);
+  const isMobile = useIsMobile();
 
   const tone =
     project.status === 2 ? 'success' : project.status === 1 ? 'failed' : 'primary';
 
-  const quickAmounts = useMemo(() => {
-    const min = project.minContribution;
-    const candidates = [min, min * 2n, parseEther('1'), parseEther('2'), parseEther('5')];
-    const seen = new Set();
-    return candidates
-      .filter((value) => {
-        if (value < min) return false;
-        const key = value.toString();
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      })
-      .slice(0, 4)
-      .map((value) => ethInputValue(value));
-  }, [project.minContribution]);
+  const raisedEth = Number(project.totalRaised) / 1e18;
+
+  const scrollToForm = () => {
+    amountRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    amountRef.current?.focus({ preventScroll: true });
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+    setFieldError('');
+
+    let value;
+    try {
+      value = parseEth(amount);
+    } catch (error) {
+      setFieldError(error.message);
+      return;
+    }
+
+    if (value < project.minContribution) {
+      setFieldError(
+        `Le don minimum est de ${formatEth(project.minContribution)} ETH.`,
+      );
+      return;
+    }
+
+    const result = await tx.run(async () => {
+      const signer = await getSigner();
+      return donate(project.address, amount, signer);
+    });
+
+    if (result.ok) {
+      setConfirmedAmount(value);
+      toast.success(
+        'Don envoyé',
+        `${formatEth(value)} ETH ajoutés à la campagne.`,
+      );
+      onDone();
+    } else {
+      toast.error(
+        "Le don n'a pas abouti",
+        "La transaction a échoué, aucun fonds n'a été déplacé.",
+      );
+    }
+  };
+
+  const mobileActionBar = isMobile ? (
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 py-3 shadow-[0_-8px_24px_-16px_rgba(15,23,42,0.45)] backdrop-blur lg:hidden">
+      <div className="flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs text-slate-500">Montant du don</p>
+          <p className="truncate text-sm font-semibold tabular-nums text-slate-900">
+            {amount ? `${amount} ETH` : '— ETH'}
+          </p>
+        </div>
+        <Button type="button" onClick={scrollToForm} className="shrink-0">
+          Donner
+        </Button>
+      </div>
+    </div>
+  ) : null;
 
   if (project.status !== 0) {
     return (
@@ -142,117 +199,114 @@ function DonateCard({ project, onDone }) {
     );
   }
 
-  const submit = async (event) => {
-    event.preventDefault();
-    setFieldError('');
-
-    let value;
-    try {
-      value = parseEth(amount);
-    } catch (error) {
-      setFieldError(error.message);
-      return;
-    }
-
-    if (value < project.minContribution) {
-      setFieldError(
-        `Le don minimum est de ${formatEth(project.minContribution)} ETH.`,
-      );
-      return;
-    }
-
-    const result = await tx.run(async () => {
-      const signer = await getSigner();
-      return donate(project.address, amount, signer);
-    });
-
-    if (result.ok) {
-      toast.success(
-        'Don envoyé',
-        `${formatEth(value)} ETH ajoutés à la campagne.`,
-      );
-      setAmount('');
-      onDone();
-    }
-  };
-
   return (
-    <Card padded={false} className="overflow-hidden shadow-lg ring-1 ring-slate-200/70">
-      <div className="border-b border-slate-100 bg-slate-50/60 p-5 sm:p-6">
-        <p className="text-3xl font-bold tracking-tight text-slate-900">
-          {formatEth(project.totalRaised)} ETH
-        </p>
-        <p className="mt-1 text-sm text-slate-500">
-          collectés sur un objectif de {formatEth(project.goal)} ETH
-        </p>
-        <ProgressBar
-          className="mt-3"
-          raised={project.totalRaised}
-          goal={project.goal}
-          tone={tone}
-        />
-        <div className="mt-3 flex items-center justify-between gap-3 text-sm">
-          <span className="flex min-w-0 items-center gap-2 text-slate-500">
-            <DonorAvatars donors={project.donors} />
-            {project.donors.length} donateur
-            {project.donors.length > 1 ? 's' : ''}
-          </span>
-          <span className="shrink-0 font-medium text-slate-600">
-            {formatPercent(project.totalRaised, project.goal)} de l'objectif
-          </span>
-        </div>
-      </div>
-
-      <div className="p-5 sm:p-6">
-        <h2 className="text-lg font-semibold tracking-tight text-slate-900">
-          Donner à cette campagne
-        </h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Don minimum : {formatEth(project.minContribution)} ETH. Les fonds sont
-          conservés par le contrat jusqu'à la date limite.
-        </p>
-
-      {(project.contributions ?? 0n) > 0n ? (
-        <p className="mt-3 rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-900">
-          Votre contribution actuelle :{' '}
-          <strong>{formatEth(project.contributions)} ETH</strong>
-        </p>
-      ) : null}
-
-      <form className="mt-4 space-y-3" onSubmit={submit}>
-        <Field
-          id="donation-amount"
-          label="Montant du don (ETH)"
-          placeholder="0,5"
-          inputMode="decimal"
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-          error={fieldError}
-          hint={`Minimum ${formatEth(project.minContribution)} ETH`}
-          required
-        />
-
-        <div className="flex flex-wrap gap-2">
-          {quickAmounts.map((value) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => setAmount(value)}
-              className="rounded-full border border-slate-300 bg-white px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-indigo-400 hover:text-indigo-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
-            >
-              {value} ETH
-            </button>
-          ))}
+    <>
+      <Card padded={false} className="overflow-hidden shadow-lg ring-1 ring-slate-200/70">
+        <div className="border-b border-slate-100 bg-slate-50/60 p-5 sm:p-6">
+          <p className="text-3xl font-bold tracking-tight text-slate-900">
+            <CountUp
+              value={raisedEth}
+              format={(value) => formatEthNumber(value)}
+              suffix=" ETH"
+            />
+          </p>
+          <p className="mt-1 text-sm tabular-nums text-slate-500">
+            collectés sur un objectif de {formatEth(project.goal)} ETH
+          </p>
+          <ProgressBar
+            className="mt-3"
+            raised={project.totalRaised}
+            goal={project.goal}
+            tone={tone}
+          />
+          <p className="mt-2 text-xs font-medium tabular-nums text-slate-500">
+            {remainingLabel(project.totalRaised, project.goal)}
+          </p>
+          <div className="mt-3 flex items-center justify-between gap-3 text-sm">
+            <span className="flex min-w-0 items-center gap-2 text-slate-500">
+              <DonorAvatars donors={project.donors} />
+              {plural(project.donors.length, 'donateur')}
+            </span>
+            <span className="shrink-0 font-medium tabular-nums text-slate-600">
+              {formatPercent(project.totalRaised, project.goal)} de l'objectif
+            </span>
+          </div>
         </div>
 
-        {tx.error ? <Alert tone="rose">{tx.error}</Alert> : null}
+        <div className="p-5 sm:p-6">
+          {confirmedAmount !== null ? (
+            <ConfirmationState
+              title={`Merci ! Votre don de ${formatEth(confirmedAmount)} ETH est confirmé`}
+              message="Votre contribution a été ajoutée à la campagne. Les fonds restent verrouillés jusqu'à la date limite."
+              shareUrl={
+                typeof window !== 'undefined' ? window.location.href : undefined
+              }
+              campaignAddress={project.address}
+            />
+          ) : (
+            <>
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+                Donner à cette campagne
+              </h2>
+              <p className="mt-1 text-sm tabular-nums text-slate-600">
+                Don minimum : {formatEth(project.minContribution)} ETH. Les fonds
+                sont conservés par le contrat jusqu'à la date limite.
+              </p>
 
-        <Button type="submit" fullWidth loading={tx.isPending}>
-          {amount ? `Donner ${amount} ETH` : 'Donner'}
-        </Button>
-      </form>
-      </div>
-    </Card>
+              {(project.contributions ?? 0n) > 0n ? (
+                <p className="mt-3 rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-900">
+                  Votre contribution actuelle :{' '}
+                  <strong className="tabular-nums">
+                    {formatEth(project.contributions)} ETH
+                  </strong>
+                </p>
+              ) : null}
+
+              <form className="mt-4 space-y-4" onSubmit={submit}>
+                <DonationPresets
+                  min={project.minContribution}
+                  value={amount}
+                  onSelect={setAmount}
+                />
+
+                <div ref={amountRef} className="scroll-mt-28">
+                  <Field
+                    id="donation-amount"
+                    label="Montant du don (ETH)"
+                    placeholder="0,5"
+                    inputMode="decimal"
+                    value={amount}
+                    onChange={(event) => setAmount(event.target.value)}
+                    error={fieldError}
+                    hint={`Minimum ${formatEth(project.minContribution)} ETH`}
+                    required
+                  />
+                </div>
+
+                <SigningPreview
+                  preview={
+                    amount
+                      ? `Vous allez donner ${amount} ETH à cette campagne.`
+                      : `Vous allez donner un montant à cette campagne (minimum ${formatEth(
+                          project.minContribution,
+                        )} ETH).`
+                  }
+                  status={tx.status}
+                  error={tx.error}
+                />
+
+                {tx.error ? <Alert tone="rose">{tx.error}</Alert> : null}
+
+                <Button type="submit" fullWidth loading={tx.isPending}>
+                  Donner
+                </Button>
+              </form>
+            </>
+          )}
+        </div>
+      </Card>
+      {mobileActionBar}
+    </>
   );
 }
 
@@ -308,6 +362,11 @@ function CreateRequestForm({ project, onDone }) {
       setAmount('');
       setReason('');
       onDone();
+    } else {
+      toast.error(
+        "La demande n'a pas été créée",
+        "La transaction a échoué, aucun retrait n'a été demandé.",
+      );
     }
   };
 
@@ -349,6 +408,16 @@ function CreateRequestForm({ project, onDone }) {
           required
         />
 
+        <SigningPreview
+          preview={
+            amount
+              ? `Vous allez demander ${amount} ETH à la campagne, pour le motif « ${reason.trim() || '…'} ».`
+              : "Vous allez demander un retrait à la campagne pour vos donateurs."
+          }
+          status={tx.status}
+          error={tx.error}
+        />
+
         {error ? <Alert tone="rose">{error}</Alert> : null}
         {tx.error ? <Alert tone="rose">{tx.error}</Alert> : null}
 
@@ -364,6 +433,7 @@ function RequestCard({ request, project, isCreator, onDone }) {
   const { account } = useWallet();
   const toast = useToast();
   const tx = useTransaction();
+  const [confirmed, setConfirmed] = useState(null);
 
   const donorCount = project.donors.length;
   const quorumReached = request.approvals * 2 >= donorCount;
@@ -375,19 +445,26 @@ function RequestCard({ request, project, isCreator, onDone }) {
   const canWithdraw =
     isCreator && !request.executed && quorumReached && donorCount > 0;
 
-  const run = async (action, successTitle, successText) => {
+  const run = async (action, successTitle, successText, preview) => {
     const result = await tx.run(action);
     if (result.ok) {
+      setConfirmed(preview);
       toast.success(successTitle, successText);
       onDone();
+    } else {
+      toast.error(
+        "L'action n'a pas abouti",
+        "La transaction a échoué, rien n'a été modifié.",
+      );
     }
+    return result;
   };
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-slate-900">
+          <p className="text-sm font-semibold tabular-nums text-slate-900">
             Demande #{request.id} · {formatEth(request.amount)} ETH
           </p>
           <p className="mt-1 text-sm text-slate-600">{request.reason}</p>
@@ -404,8 +481,7 @@ function RequestCard({ request, project, isCreator, onDone }) {
       <div className="mt-3">
         <div className="flex items-center justify-between text-xs text-slate-500">
           <span>
-            {request.approvals} vote{request.approvals > 1 ? 's' : ''} sur{' '}
-            {donorCount} donateur{donorCount > 1 ? 's' : ''}
+            {plural(request.approvals, 'vote')} sur {plural(donorCount, 'donateur')}
           </span>
           <span>Destinataire : {request.recipient.slice(0, 6)}…</span>
         </div>
@@ -424,61 +500,94 @@ function RequestCard({ request, project, isCreator, onDone }) {
         </p>
       ) : null}
 
-      {tx.error ? (
-        <Alert tone="rose" className="mt-3">
-          {tx.error}
-        </Alert>
-      ) : null}
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {canVote ? (
-          <Button
-            size="sm"
-            loading={tx.isPending}
-            onClick={() =>
-              run(
-                async () => {
-                  const signer = await getSigner();
-                  return voteWithdrawRequest(project.address, request.id, signer);
-                },
-                'Vote enregistré',
-                `Demande #${request.id} approuvée.`,
-              )
+      {confirmed ? (
+        <ConfirmationState
+          className="mt-3"
+          title="Merci ! Votre action est confirmée"
+          message={confirmed}
+          shareUrl={
+            typeof window !== 'undefined' ? window.location.href : undefined
+          }
+          campaignAddress={project.address}
+        />
+      ) : (
+        <>
+          <SigningPreview
+            className="mt-3"
+            preview={
+              canVote
+                ? `Vous allez voter pour approuver la demande #${request.id} de ${formatEth(
+                    request.amount,
+                  )} ETH.`
+                : `La demande #${request.id} de ${formatEth(
+                    request.amount,
+                  )} ETH est ouverte au vote des donateurs.`
             }
-          >
-            Voter
-          </Button>
-        ) : null}
+            status={tx.status}
+            error={tx.error}
+          />
 
-        {canWithdraw ? (
-          <Button
-            size="sm"
-            loading={tx.isPending}
-            onClick={() =>
-              run(
-                async () => {
-                  const signer = await getSigner();
-                  return withdrawRequestedAmount(
-                    project.address,
-                    request.id,
-                    signer,
-                  );
-                },
-                'Retrait effectué',
-                `${formatEth(request.amount)} ETH envoyés au destinataire.`,
-              )
-            }
-          >
-            Retirer
-          </Button>
-        ) : null}
+          {tx.error ? (
+            <Alert tone="rose" className="mt-3">
+              {tx.error}
+            </Alert>
+          ) : null}
 
-        {!account && !request.executed ? (
-          <p className="text-xs text-slate-500">
-            Connectez-vous pour voter sur cette demande.
-          </p>
-        ) : null}
-      </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {canVote ? (
+              <Button
+                size="sm"
+                loading={tx.isPending}
+                onClick={() =>
+                  run(
+                    async () => {
+                      const signer = await getSigner();
+                      return voteWithdrawRequest(project.address, request.id, signer);
+                    },
+                    'Vote enregistré',
+                    `Demande #${request.id} approuvée.`,
+                    `Votre vote pour la demande #${request.id} de ${formatEth(
+                      request.amount,
+                    )} ETH est enregistré sur la chaîne locale.`,
+                  )
+                }
+              >
+                Voter
+              </Button>
+            ) : null}
+
+            {canWithdraw ? (
+              <Button
+                size="sm"
+                loading={tx.isPending}
+                onClick={() =>
+                  run(
+                    async () => {
+                      const signer = await getSigner();
+                      return withdrawRequestedAmount(
+                        project.address,
+                        request.id,
+                        signer,
+                      );
+                    },
+                    'Retrait effectué',
+                    `${formatEth(request.amount)} ETH envoyés au destinataire.`,
+                    `${formatEth(request.amount)} ETH ont été envoyés au destinataire de la demande #${request.id}.`,
+                  )
+                }
+              >
+                Retirer
+              </Button>
+            ) : null}
+
+            {!account && !request.executed ? (
+              <p className="text-xs text-slate-500">
+                Connectez-vous pour voter sur cette demande.
+              </p>
+            ) : null}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -486,6 +595,7 @@ function RequestCard({ request, project, isCreator, onDone }) {
 function RefundCard({ project, onDone }) {
   const toast = useToast();
   const tx = useTransaction();
+  const [confirmed, setConfirmed] = useState(false);
 
   const submit = async () => {
     const result = await tx.run(async () => {
@@ -494,23 +604,52 @@ function RefundCard({ project, onDone }) {
     });
 
     if (result.ok) {
+      setConfirmed(true);
       toast.success(
         'Remboursement reçu',
         `${formatEth(project.contributions)} ETH récupérés.`,
       );
       onDone();
+    } else {
+      toast.error(
+        "Le remboursement n'a pas abouti",
+        "La transaction a échoué, vos fonds restent dans le contrat.",
+      );
     }
   };
+
+  if (confirmed) {
+    return (
+      <ConfirmationState
+        title={`Merci ! Votre remboursement de ${formatEth(
+          project.contributions,
+        )} ETH est confirmé`}
+        message="Vos fonds ont été rendus sur la chaîne locale."
+        shareUrl={
+          typeof window !== 'undefined' ? window.location.href : undefined
+        }
+        campaignAddress={project.address}
+      />
+    );
+  }
 
   return (
     <Card>
       <h2 className="text-base font-semibold text-slate-900">
         Campagne échouée
       </h2>
-      <p className="mt-2 text-sm text-slate-600">
+      <p className="mt-2 text-sm tabular-nums text-slate-600">
         L'objectif n'a pas été atteint. Vous pouvez récupérer votre
         contribution de {formatEth(project.contributions)} ETH.
       </p>
+
+      <SigningPreview
+        className="mt-3"
+        preview={`Vous allez récupérer ${formatEth(project.contributions)} ETH sur la chaîne locale.`}
+        status={tx.status}
+        error={tx.error}
+      />
+
       {tx.error ? (
         <Alert tone="rose" className="mt-3">
           {tx.error}
@@ -522,7 +661,9 @@ function RefundCard({ project, onDone }) {
         loading={tx.isPending}
         onClick={submit}
       >
-        Rembourser {formatEth(project.contributions)} ETH
+        <span className="tabular-nums">
+          Rembourser {formatEth(project.contributions)} ETH
+        </span>
       </Button>
     </Card>
   );
@@ -562,7 +703,7 @@ export default function ProjectPage() {
         title="Campagne introuvable"
         description="Cette adresse ne correspond pas à une campagne valide."
         action={
-          <Link to="/" className="text-sm font-semibold text-indigo-700">
+          <Link to="/" className="text-sm font-semibold text-emerald-700">
             ← Retour aux campagnes
           </Link>
         }
@@ -586,7 +727,6 @@ export default function ProjectPage() {
   const isCreator =
     Boolean(wallet.account) &&
     wallet.account.toLowerCase() === project.creator.toLowerCase();
-  const seconds = secondsLeft(project.deadline);
   const tone =
     project.status === 2 ? 'success' : project.status === 1 ? 'failed' : 'primary';
 
@@ -603,11 +743,12 @@ export default function ProjectPage() {
   };
 
   return (
-    <div className="space-y-8">
+    // `pb-24` réserve la place de la barre d'action fixe sur mobile.
+    <div className="space-y-8 pb-24 lg:pb-0">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           to="/"
-          className="inline-flex items-center text-sm font-semibold text-slate-600 transition hover:text-indigo-700"
+          className="inline-flex items-center text-sm font-semibold text-slate-600 transition hover:text-emerald-700"
         >
           ← Toutes les campagnes
         </Link>
@@ -639,16 +780,7 @@ export default function ProjectPage() {
       ) : null}
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-8">
-        <aside className="space-y-6 order-first lg:order-2">
-          <div className="lg:sticky lg:top-24 lg:h-fit lg:space-y-6">
-            <DonateCard project={project} onDone={reload} />
-            {project.status === 1 && (project.contributions ?? 0n) > 0n ? (
-              <RefundCard project={project} onDone={reload} />
-            ) : null}
-          </div>
-        </aside>
-
-        <div className="space-y-6 lg:order-1">
+        <div className="space-y-6">
           <header className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
@@ -662,13 +794,34 @@ export default function ProjectPage() {
                 Créateur : <CopyAddress value={project.creator} label="le créateur" chars={3} />
               </span>
               <span>Date limite : {formatDeadline(project.deadline)}</span>
-              <span>{timeLeftLabel(seconds)}</span>
+              <span>
+                <Countdown deadline={project.deadline} />
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-600 shadow-sm">
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-emerald-500"
+                  aria-hidden="true"
+                />
+                Réseau {CHAIN_ID}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                Adresse de la campagne
+                <CopyAddress
+                  value={project.address}
+                  label="l'adresse de la campagne"
+                />
+              </span>
             </div>
             <ProgressBar
               raised={project.totalRaised}
               goal={project.goal}
               tone={tone}
             />
+            <p className="text-sm font-medium tabular-nums text-slate-600">
+              {remainingLabel(project.totalRaised, project.goal)}
+            </p>
           </header>
           <Card>
             <h2 className="text-lg font-semibold tracking-tight text-slate-900">
@@ -693,7 +846,13 @@ export default function ProjectPage() {
               <Metric label="Demandes" value={project.withdrawRequestsCount} />
               <Metric
                 label="Temps restant"
-                value={project.status === 0 ? timeLeftLabel(seconds) : 'Terminée'}
+                value={
+                  project.status === 0 ? (
+                    <Countdown deadline={project.deadline} />
+                  ) : (
+                    'Terminée'
+                  )
+                }
               />
             </dl>
           </Card>
@@ -709,11 +868,14 @@ export default function ProjectPage() {
             </div>
 
             {project.withdrawRequests.length === 0 ? (
-              <p className="mt-4 rounded-xl border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500">
-                {project.status === 2
-                  ? "Le créateur n'a pas encore créé de demande."
-                  : 'Les demandes de retrait seront disponibles si la campagne réussit.'}
-              </p>
+              <EmptyState
+                className="mt-4"
+                title={
+                  project.status === 2
+                    ? "Le créateur n'a pas encore créé de demande."
+                    : 'Les demandes de retrait seront disponibles si la campagne réussit.'
+                }
+              />
             ) : (
               <div className="mt-4 space-y-3">
                 {project.withdrawRequests.map((request) => (
@@ -746,9 +908,10 @@ export default function ProjectPage() {
             </div>
 
             {project.donors.length === 0 ? (
-              <p className="mt-4 text-sm text-slate-500">
-                Aucun don pour le moment. Soyez le premier à soutenir ce projet.
-              </p>
+              <EmptyState
+                className="mt-4"
+                title="Aucun don pour le moment. Soyez le premier à soutenir ce projet."
+              />
             ) : (
               <ul className="mt-4 divide-y divide-slate-100">
                 {project.donors.slice(0, 50).map((donor) => (
@@ -772,7 +935,7 @@ export default function ProjectPage() {
                         <Badge tone="neutral">Vous</Badge>
                       ) : null}
                     </span>
-                    <span className="shrink-0 text-sm font-semibold text-slate-800">
+                    <span className="shrink-0 text-sm font-semibold tabular-nums text-slate-800">
                       {formatEth(donor.amount)} ETH
                     </span>
                   </li>
@@ -786,7 +949,16 @@ export default function ProjectPage() {
               </p>
             ) : null}
           </Card>
+
+          <Faq />
         </div>
+
+        <aside className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
+          <DonateCard project={project} onDone={reload} />
+          {project.status === 1 && (project.contributions ?? 0n) > 0n ? (
+            <RefundCard project={project} onDone={reload} />
+          ) : null}
+        </aside>
       </div>
     </div>
   );

@@ -11,7 +11,7 @@ const NAV_LINKS = [
   {
     to: '/my-contributions',
     label: 'Mes contributions',
-    shortLabel: 'Contributions',
+    shortLabel: 'Dons',
   },
 ];
 
@@ -28,10 +28,10 @@ function navLinkClass({ isActive }) {
 export default function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 backdrop-blur">
-      <div className="relative mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:h-16 sm:flex-nowrap sm:px-6 sm:py-0 lg:px-8">
+      <div className="relative mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:gap-4 sm:px-6 lg:px-8">
         <Link
           to="/"
-          className="group flex items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+          className="group flex shrink-0 items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
           aria-label="Cagnotte — retour à l’accueil"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shadow-emerald-600/20 transition-colors group-hover:bg-emerald-700">
@@ -61,19 +61,25 @@ export default function Header() {
               <path strokeLinecap="round" d="M7.5 20.25h9" />
             </svg>
           </span>
-          <span className="flex flex-col leading-none">
+          <span className="hidden flex-col leading-none lg:flex">
             <span className="text-base font-semibold tracking-tight text-slate-900">
               Cagnotte
             </span>
-            <span className="mt-1 hidden text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500 sm:block">
+            <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.14em] text-slate-500">
               Financement participatif
             </span>
           </span>
+          {/* Sur mobile, seule la marque suffit : la navigation garde la place. */}
+          <span className="sr-only lg:hidden">Cagnotte</span>
         </Link>
 
+        {/* La navigation reste un enfant flex sur mobile et tablette (pas de
+            centrage absolu avant lg) : plus de pincement entre 640 et 768 px.
+            Sur les écrans étroits elle défile horizontalement, avec un dégradé
+            qui signale la fin de la liste. */}
         <nav
           aria-label="Navigation principale"
-          className="order-3 flex w-full flex-wrap items-center gap-1 sm:absolute sm:left-1/2 sm:top-1/2 sm:order-none sm:w-auto sm:-translate-x-1/2 sm:-translate-y-1/2"
+          className="nav-scroll -mx-1 flex min-w-0 flex-1 items-center gap-1 overflow-x-auto px-1 lg:absolute lg:left-1/2 lg:top-1/2 lg:m-0 lg:flex-none lg:translate-x-[-50%] lg:translate-y-[-50%] lg:overflow-visible lg:px-0"
         >
           {NAV_LINKS.map((link) => (
             <NavLink
@@ -83,13 +89,13 @@ export default function Header() {
               aria-label={link.label}
               className={navLinkClass}
             >
-              <span className="sm:hidden">{link.shortLabel}</span>
-              <span className="hidden sm:inline">{link.label}</span>
+              <span className="lg:hidden">{link.shortLabel}</span>
+              <span className="hidden lg:inline">{link.label}</span>
             </NavLink>
           ))}
         </nav>
 
-        <div className="order-2 ml-auto sm:order-none">
+        <div className="ml-auto shrink-0">
           <WalletButton />
         </div>
       </div>

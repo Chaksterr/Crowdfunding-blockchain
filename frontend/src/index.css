@@ -29,12 +29,12 @@
   }
 
   ::selection {
-    background-color: theme('colors.indigo.200');
-    color: theme('colors.indigo.950');
+    background-color: theme('colors.emerald.200');
+    color: theme('colors.emerald.950');
   }
 
   :focus-visible {
-    outline: 2px solid theme('colors.indigo.500');
+    outline: 2px solid theme('colors.emerald.600');
     outline-offset: 2px;
   }
 
@@ -48,12 +48,66 @@
     animation: rise 160ms ease-out both;
   }
 
+  /* L'animation se termine sur `transform: none` : un transform résiduel
+     créerait un contexte de positionnement qui casserait les barres fixes. */
   @keyframes rise {
     from {
       transform: translateY(4px);
     }
     to {
+      transform: none;
+    }
+  }
+
+  .animate-sink {
+    animation: sink 180ms ease-in both;
+  }
+
+  /* Navigation horizontale sur mobile : sans barre visible, avec un dégradé
+     à droite qui signale qu'il reste des liens à faire défiler. */
+  .nav-scroll {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    mask-image: linear-gradient(
+      to right,
+      black 0,
+      black calc(100% - 24px),
+      transparent 100%
+    );
+  }
+
+  .nav-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes sink {
+    from {
+      opacity: 1;
       transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .shimmer-primary {
+    background-image: linear-gradient(
+      100deg,
+      rgba(255, 255, 255, 0) 20%,
+      rgba(255, 255, 255, 0.45) 50%,
+      rgba(255, 255, 255, 0) 80%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.4s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 180% 0;
+    }
+    to {
+      background-position: -80% 0;
     }
   }
 }

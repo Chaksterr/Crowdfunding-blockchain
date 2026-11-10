@@ -4,7 +4,6 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 
@@ -19,6 +18,10 @@ const TONES = {
   error: {
     border: 'border-l-rose-500',
     icon: 'bg-rose-50 text-rose-600',
+  },
+  pending: {
+    border: 'border-l-indigo-500',
+    icon: 'bg-indigo-50 text-indigo-600',
   },
 };
 
@@ -56,20 +59,50 @@ function ErrorIcon() {
   );
 }
 
+function PendingIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <circle cx="10" cy="10" r="7" opacity="0.35" />
+      <path
+        strokeLinecap="round"
+        d="M10 6v4.2l2.6 1.6"
+        className="animate-spin"
+        style={{ transformOrigin: '10px 10px' }}
+      />
+    </svg>
+  );
+}
+
 function ToastItem({ toast, onDismiss }) {
   const [paused, setPaused] = useState(false);
+  const [closing, setClosing] = useState(false);
   const tone = TONES[toast.tone] ?? TONES.success;
 
-  useEffect(() => {
-    if (paused) return undefined;
-
-    const timer = setTimeout(() => onDismiss(toast.id), 4000);
+  const dismiss = useCallback(() => {
+    setClosing(true);
+    const timer = setTimeout(() => onDismiss(toast.id), 180);
     return () => clearTimeout(timer);
-  }, [paused, toast.id, onDismiss]);
+  }, [onDismiss, toast.id]);
+
+  useEffect(() => {
+    if (paused || closing) return undefined;
+
+    const timer = setTimeout(() => dismiss(), 4000);
+    return () => clearTimeout(timer);
+  }, [paused, closing, dismiss]);
 
   return (
     <div
-      className={`animate-rise pointer-events-auto flex w-full items-start gap-3 rounded-2xl border border-slate-200 border-l-4 bg-white p-3.5 shadow-lg sm:w-96 ${tone.border}`}
+      className={`pointer-events-auto flex w-full items-start gap-3 rounded-2xl border border-slate-200 border-l-4 bg-white p-3.5 shadow-lg sm:w-96 ${
+        closing ? 'animate-sink' : 'animate-rise'
+      } ${tone.border}`}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -78,7 +111,13 @@ function ToastItem({ toast, onDismiss }) {
       <span
         className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${tone.icon}`}
       >
-        {toast.tone === 'error' ? <ErrorIcon /> : <SuccessIcon />}
+        {toast.tone === 'error' ? (
+          <ErrorIcon />
+        ) : toast.tone === 'pending' ? (
+          <PendingIcon />
+        ) : (
+          <SuccessIcon />
+        )}
       </span>
 
       <div className="min-w-0 flex-1">
@@ -92,9 +131,9 @@ function ToastItem({ toast, onDismiss }) {
 
       <button
         type="button"
-        onClick={() => onDismiss(toast.id)}
+        onClick={dismiss}
         aria-label="Fermer la notification"
-        className="shrink-0 rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+        className="shrink-0 rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
       >
         <svg
           viewBox="0 0 20 20"
@@ -111,7 +150,7 @@ function ToastItem({ toast, onDismiss }) {
 
 /**
  * Notifications éphémères (4 s), refermables, annoncées aux lecteurs d'écran.
- * P2.6–P2.7 réutiliseront `toast.success` / `toast.error`.
+ * `toast.success` / `toast.error` / `toast.pending` sont exposés.
  */
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -129,6 +168,7 @@ export function ToastProvider({ children }) {
     () => ({
       success: (title, description) => push('success', title, description),
       error: (title, description) => push('error', title, description),
+      pending: (title, description) => push('pending', title, description),
     }),
     [push],
   );
@@ -137,10 +177,12 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={toast}>
       {children}
 
+      {/* Sur mobile, les notifications restent au-dessus de la barre d'action
+          fixe du bas pour ne jamais la masquer. */}
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 px-4 pb-4 sm:items-end sm:px-6 sm:pb-6"
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 px-4 pb-24 sm:bottom-6 sm:items-end sm:px-6 sm:pb-0"
       >
         {toasts.map((item) => (
           <ToastItem key={item.id} toast={item} onDismiss={dismiss} />

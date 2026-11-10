@@ -5,6 +5,7 @@ import Card from "../components/ui/Card";
 import Field from "../components/ui/Field";
 import Button, { buttonClass } from "../components/ui/Button";
 import Alert from "../components/ui/Alert";
+import SigningPreview from "../components/SigningPreview";
 import { useWallet } from "../hooks/useWallet";
 import { useTransaction } from "../hooks/useTransaction";
 import { useToast } from "../components/ToastProvider";
@@ -18,6 +19,14 @@ const INITIAL = {
   minContributionEth: "",
   durationMinutes: "10",
 };
+
+/** Préréglages de durée : ils pré-remplissent le champ « Durée (minutes) ». */
+const DURATION_PRESETS = [
+  { id: "10min", label: "10 min", minutes: 10 },
+  { id: "1h", label: "1 h", minutes: 60 },
+  { id: "24h", label: "24 h", minutes: 1440 },
+  { id: "7j", label: "7 j", minutes: 10080 },
+];
 
 function validate(values) {
   const errors = {};
@@ -56,6 +65,26 @@ function validate(values) {
   return errors;
 }
 
+/** Résumé en langage clair de ce qui sera créé. */
+function creationSummary({ title, goal, min, duration }) {
+  const name = title ? `la campagne « ${title} »` : "une campagne";
+
+  const goalLabel =
+    Number.isFinite(goal) && goal > 0 ? `${goal} ETH` : "un montant à définir";
+  const minLabel =
+    Number.isFinite(min) && min > 0 ? `${min} ETH` : "un montant à définir";
+  const durationLabel =
+    Number.isInteger(duration) && duration > 0
+      ? duration >= 1440
+        ? `${Math.round(duration / 1440)} jour(s)`
+        : duration >= 60
+          ? `${Math.round(duration / 60)} heure(s)`
+          : `${duration} minute(s)`
+      : "une durée à définir";
+
+  return `Vous allez créer ${name} avec un objectif de ${goalLabel}, un don minimum de ${minLabel} et une durée de ${durationLabel}.`;
+}
+
 export default function CreatePage() {
   const navigate = useNavigate();
   const { isConnected, isConnecting, isWrongNetwork, connect, switchNetwork } =
@@ -68,6 +97,12 @@ export default function CreatePage() {
   const update = (field) => (event) => {
     setValues((current) => ({ ...current, [field]: event.target.value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
+    tx.reset();
+  };
+
+  const applyPreset = (minutes) => {
+    setValues((current) => ({ ...current, durationMinutes: String(minutes) }));
+    setErrors((current) => ({ ...current, durationMinutes: undefined }));
     tx.reset();
   };
 
@@ -97,6 +132,11 @@ export default function CreatePage() {
         "Vous allez être redirigé vers la page de votre campagne."
       );
       navigate(`/project/${result.result}`);
+    } else {
+      toast.error(
+        "La campagne n'a pas été créée",
+        "La transaction a échoué, aucune campagne n'a été publiée."
+      );
     }
   };
 
@@ -205,18 +245,66 @@ export default function CreatePage() {
               />
             </div>
 
-            <Field
-              id="durationMinutes"
-              label="Durée (minutes)"
-              hint="La date limite est calculée à la création. Pour une démo, 1 à 2 minutes suffisent."
-              error={errors.durationMinutes}
-              value={values.durationMinutes}
-              onChange={update("durationMinutes")}
-              type="number"
-              min={1}
-              max={10080}
-              step={1}
-              required
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-medium text-slate-700">
+                  Durée de la collecte
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Choisissez une durée rapide ou saisissez un nombre de minutes
+                  exact.
+                </p>
+              </div>
+
+              <div
+                role="group"
+                aria-label="Durée de la collecte"
+                className="flex flex-wrap gap-2"
+              >
+                {DURATION_PRESETS.map((preset) => {
+                  const isActive = String(duration) === String(preset.minutes);
+                  return (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => applyPreset(preset.minutes)}
+                      aria-pressed={isActive}
+                      className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] ${
+                        isActive
+                          ? "border-emerald-600 bg-emerald-600 text-white shadow-sm"
+                          : "border-slate-300 bg-white text-slate-700 hover:border-emerald-400 hover:text-emerald-700"
+                      }`}
+                    >
+                      {preset.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <Field
+                id="durationMinutes"
+                label="Durée (minutes)"
+                hint="La date limite est calculée à la création. Pour une démo, 1 à 2 minutes suffisent."
+                error={errors.durationMinutes}
+                value={values.durationMinutes}
+                onChange={update("durationMinutes")}
+                type="number"
+                min={1}
+                max={10080}
+                step={1}
+                required
+              />
+            </div>
+
+            <SigningPreview
+              preview={creationSummary({
+                title: values.title.trim(),
+                goal,
+                min,
+                duration,
+              })}
+              status={tx.status}
+              error={tx.error}
             />
 
             {tx.error ? (
@@ -242,19 +330,19 @@ export default function CreatePage() {
             <dl className="space-y-3 text-sm">
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-slate-500">Objectif</dt>
-                <dd className="font-semibold text-slate-900">
+                <dd className="font-semibold tabular-nums text-slate-900">
                   {Number.isFinite(goal) && goal > 0 ? `${goal} ETH` : "—"}
                 </dd>
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-slate-500">Don minimum</dt>
-                <dd className="font-semibold text-slate-900">
+                <dd className="font-semibold tabular-nums text-slate-900">
                   {Number.isFinite(min) && min > 0 ? `${min} ETH` : "—"}
                 </dd>
               </div>
               <div className="flex items-baseline justify-between gap-3">
                 <dt className="text-slate-500">Durée</dt>
-                <dd className="font-semibold text-slate-900">
+                <dd className="font-semibold tabular-nums text-slate-900">
                   {Number.isInteger(duration) && duration > 0
                     ? `${duration} min`
                     : "—"}

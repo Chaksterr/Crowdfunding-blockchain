@@ -11,11 +11,11 @@ import { useAsyncData } from '../hooks/useAsyncData';
 import { useWallet } from '../hooks/useWallet';
 import { getProject } from '../web3/contracts';
 import { loadProjects } from '../web3/projects';
-import { formatEth, timeLeftLabel } from '../web3/format';
+import { formatEth, plural, timeLeftLabel } from '../web3/format';
 
 function ContributionSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2" aria-hidden="true">
+    <div className="grid gap-4 sm:gap-6 sm:grid-cols-2" aria-hidden="true">
       {[0, 1].map((index) => (
         <div
           key={index}
@@ -23,6 +23,25 @@ function ContributionSkeleton() {
         />
       ))}
     </div>
+  );
+}
+
+function HeartIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      className="h-6 w-6"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 20s-7-4.35-7-9a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 4.65-7 9-7 9Z"
+      />
+    </svg>
   );
 }
 
@@ -99,6 +118,7 @@ export default function MyContributionsPage() {
 
       {isConnected && contributions && contributions.length === 0 ? (
         <EmptyState
+          icon={<HeartIcon />}
           title="Aucune contribution pour le moment"
           description="Explorez les campagnes en cours et soutenez un projet qui vous tient à cœur."
           action={
@@ -111,30 +131,29 @@ export default function MyContributionsPage() {
 
       {isConnected && contributions && contributions.length > 0 ? (
         <>
-          <Card className="flex flex-wrap items-center justify-between gap-4 bg-indigo-50/60">
+          <Card className="flex flex-wrap items-center justify-between gap-4 border-emerald-200 bg-emerald-50/60">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-indigo-700">
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">
                 Total contribué
               </p>
-              <p className="mt-1 text-2xl font-semibold text-slate-900">
+              <p className="mt-1 text-2xl font-semibold tabular-nums text-slate-900">
                 {formatEth(total)} ETH
               </p>
             </div>
             <p className="text-sm text-slate-600">
-              {contributions.length} campagne
-              {contributions.length > 1 ? 's' : ''} soutenue
+              {plural(contributions.length, 'campagne')} soutenue
               {contributions.length > 1 ? 's' : ''}
             </p>
           </Card>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-6 sm:grid-cols-2">
             {contributions.map((project) => (
               <Card key={project.address} className="flex h-full flex-col">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <h2 className="text-lg font-semibold tracking-tight text-slate-900">
                     <Link
                       to={`/project/${project.address}`}
-                      className="transition hover:text-indigo-700"
+                      className="transition hover:text-emerald-700"
                     >
                       {project.title}
                     </Link>
@@ -144,7 +163,7 @@ export default function MyContributionsPage() {
 
                 <p className="mt-2 text-sm text-slate-600">
                   Votre contribution :{' '}
-                  <strong className="text-slate-900">
+                  <strong className="tabular-nums text-slate-900">
                     {formatEth(project.myContribution)} ETH
                   </strong>
                 </p>
@@ -155,7 +174,7 @@ export default function MyContributionsPage() {
                     goal={project.goal}
                     tone={project.status === 2 ? 'success' : undefined}
                   />
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs tabular-nums text-slate-500">
                     {formatEth(project.totalRaised)} / {formatEth(project.goal)}{' '}
                     ETH · {timeLeftLabel(project.timeLeft)}
                   </p>

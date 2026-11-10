@@ -79,10 +79,14 @@ export default function WalletButton() {
       }
     };
 
-    document.addEventListener('mousedown', handlePointerDown);
+    // pointerdown couvre souris, stylet et tactile ; click sert de filet de
+    // sécurité pour les environnements qui n'émettent pas pointerdown.
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('click', handlePointerDown);
     document.addEventListener('keydown', handleKeyDown);
     return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('click', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [open]);
@@ -112,8 +116,8 @@ export default function WalletButton() {
         aria-label="Installer MetaMask"
       >
         <WalletIcon />
-        <span className="sm:hidden">Installer</span>
         <span className="hidden sm:inline">Installer MetaMask</span>
+        <span className="sm:hidden">Installer</span>
       </a>
     );
   }
@@ -146,7 +150,8 @@ export default function WalletButton() {
     return (
       <Button size="md" onClick={connect}>
         <WalletIcon />
-        Connecter MetaMask
+        <span className="hidden sm:inline">Connecter MetaMask</span>
+        <span className="sm:hidden">Connecter</span>
       </Button>
     );
   }
@@ -164,7 +169,7 @@ export default function WalletButton() {
         aria-label={`Portefeuille ${account} — solde ${balanceLabel}${
           isWrongNetwork ? ` — mauvais réseau ${chainId}` : ''
         }`}
-        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50"
+        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-sm shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98]"
       >
         <span
           className={`h-2 w-2 shrink-0 rounded-full ${
@@ -190,7 +195,7 @@ export default function WalletButton() {
       {open && (
         <div
           id="wallet-panel"
-          className="absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+          className="animate-rise absolute right-0 z-50 mt-2 w-72 rounded-2xl border border-slate-200 bg-white p-3 shadow-lg"
         >
           <p className="px-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
             Portefeuille connecté

@@ -4,50 +4,7 @@ import { CHAIN_ID } from '../config';
 import { useWallet, useWalletListeners } from '../hooks/useWallet';
 import { hasMetaMask } from '../web3/provider';
 import Header from './Header';
-
-function Notice({ tone = 'slate', title, children, action, onDismiss }) {
-  const tones = {
-    slate: 'border-slate-200 bg-white text-slate-700',
-    amber: 'border-amber-200 bg-amber-50 text-amber-900',
-    rose: 'border-rose-200 bg-rose-50 text-rose-800',
-  };
-
-  return (
-    <div
-      role={tone === 'rose' ? 'alert' : 'status'}
-      className={`flex flex-wrap items-start gap-3 rounded-xl border px-4 py-3 text-sm ${tones[tone]}`}
-    >
-      <div className="min-w-0 flex-1">
-        {title && <p className="font-medium">{title}</p>}
-        {children && (
-          <p className={`text-sm leading-relaxed ${title ? 'mt-0.5 opacity-90' : ''}`}>
-            {children}
-          </p>
-        )}
-      </div>
-
-      {action && <div className="shrink-0 self-center">{action}</div>}
-
-      {onDismiss && (
-        <button
-          type="button"
-          onClick={onDismiss}
-          aria-label="Masquer ce message"
-          className="shrink-0 rounded-lg p-1 text-current opacity-60 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
-        >
-          <svg
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-4 w-4"
-            aria-hidden="true"
-          >
-            <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-          </svg>
-        </button>
-      )}
-    </div>
-  );
-}
+import Alert from './ui/Alert';
 
 export default function Layout({ children }) {
   useWalletListeners();
@@ -76,20 +33,20 @@ export default function Layout({ children }) {
       {hasNotices && (
         <div className="mx-auto w-full max-w-7xl space-y-3 px-4 pt-4 sm:px-6 lg:px-8">
           {error && (
-            <Notice tone="rose" onDismiss={clearError}>
+            <Alert tone="rose" onDismiss={clearError}>
               {error}
-            </Notice>
+            </Alert>
           )}
 
           {isWrongNetwork && (
-            <Notice
+            <Alert
               tone="amber"
               title="Mauvais réseau"
               action={
                 <button
                   type="button"
                   onClick={switchNetwork}
-                  className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                  className="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-900 transition-colors hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
                 >
                   Changer de réseau
                 </button>
@@ -97,11 +54,11 @@ export default function Layout({ children }) {
             >
               Votre portefeuille est sur la chaîne {chainId ?? '—'}. Passez sur
               Hardhat Local ({CHAIN_ID}) pour signer des transactions.
-            </Notice>
+            </Alert>
           )}
 
           {metaMaskMissing && (
-            <Notice tone="slate">
+            <Alert tone="slate">
               <span className="font-medium">MetaMask n’est pas détecté.</span>{' '}
               Lecture seule — les actions d’écriture sont masquées.{' '}
               <a
@@ -112,7 +69,7 @@ export default function Layout({ children }) {
               >
                 Installer MetaMask
               </a>
-            </Notice>
+            </Alert>
           )}
         </div>
       )}

@@ -27,6 +27,21 @@ export function formatEth(wei, maxDecimals = 4) {
 }
 
 /**
+ * Convertit un montant en ETH (nombre) en chaîne lisible française.
+ * Utilisé pour les animations de compteur, où la valeur est déjà décimale.
+ * @param {number|string|null|undefined} eth
+ * @param {number} maxDecimals
+ */
+export function formatEthNumber(eth, maxDecimals = 4) {
+  const value = Number(eth);
+  if (!Number.isFinite(value)) return EMPTY;
+
+  return value.toLocaleString('fr-FR', {
+    maximumFractionDigits: maxDecimals,
+  });
+}
+
+/**
  * Convertit une saisie utilisateur (virgule acceptée) en wei.
  * @param {string|number} value
  * @returns {bigint}
@@ -153,4 +168,41 @@ export function timeLeftLabel(seconds) {
   if (total < 60) return "moins d'une minute restante";
 
   return `${formatDuration(total)} restantes`;
+}
+
+/**
+ * Accord simple en nombre : `plural(1, 'donateur')` → « 1 donateur »,
+ * `plural(2, 'donateur')` → « 2 donateurs ».
+ * Le pluriel peut être fourni explicitement pour les formes irrégulières.
+ * @param {number|bigint|string} count
+ * @param {string} singular
+ * @param {string} [pluralForm]
+ */
+export function plural(count, singular, pluralForm) {
+  const value = Number(count);
+  const safe = Number.isFinite(value) ? value : 0;
+  const word = safe > 1 ? pluralForm ?? `${singular}s` : singular;
+  return `${safe} ${word}`;
+}
+
+/**
+ * Phrase « combien reste-t-il à collecter ? ».
+ * « Il manque 2,5 ETH pour atteindre l'objectif » ou « Objectif atteint ».
+ * @param {bigint|string|number} raised
+ * @param {bigint|string|number} goal
+ * @returns {string}
+ */
+export function remainingLabel(raised, goal) {
+  try {
+    const raisedValue = BigInt(raised ?? 0);
+    const goalValue = BigInt(goal ?? 0);
+    if (goalValue <= 0n) return 'Objectif atteint';
+
+    if (raisedValue >= goalValue) return 'Objectif atteint';
+
+    const missing = goalValue - raisedValue;
+    return `Il manque ${formatEth(missing)} ETH pour atteindre l'objectif`;
+  } catch {
+    return 'Objectif atteint';
+  }
 }

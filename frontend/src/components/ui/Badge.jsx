@@ -10,8 +10,8 @@ const TONES = {
     dot: 'bg-indigo-500',
   },
   ongoing: {
-    chip: 'bg-amber-100 text-amber-800 ring-amber-200',
-    dot: 'bg-amber-500',
+    chip: 'bg-sky-100 text-sky-800 ring-sky-200',
+    dot: 'bg-sky-500',
   },
   success: {
     chip: 'bg-emerald-100 text-emerald-800 ring-emerald-200',
