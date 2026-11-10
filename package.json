@@ -12,6 +12,7 @@
     "sync": "node scripts/syncAbi.js",
     "ff": "hardhat run scripts/fastForward.js --network localhost",
     "simulate": "hardhat run scripts/simulate.js --network localhost",
+    "seed": "hardhat run scripts/seedDemo.js --network localhost",
     "precommit": "bash scripts/precommit.sh",
     "prepare": "git config core.hooksPath .githooks || true"
   },
