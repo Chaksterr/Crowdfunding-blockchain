@@ -36,6 +36,17 @@ function missingMetaMaskError() {
   return error;
 }
 
+/**
+ * Signataire MetaMask, pour les transactions. Échoue proprement si aucun
+ * portefeuille n'est disponible.
+ */
+export async function getSigner() {
+  const provider = getBrowserProvider();
+  if (!provider) throw missingMetaMaskError();
+
+  return provider.getSigner();
+}
+
 /** Demande l'accès au compte et renvoie adresse + chaîne courante. */
 export async function connectWallet() {
   const provider = getBrowserProvider();

@@ -94,3 +94,63 @@ export function percent(raised, goal) {
     return 0;
   }
 }
+
+/** « 62,5 % » — un chiffre après la virgule, deux sous 1 %. */
+export function formatPercent(raised, goal) {
+  const value = percent(raised, goal);
+  const digits = value > 0 && value < 1 ? 2 : 1;
+
+  return `${new Intl.NumberFormat('fr-FR', {
+    maximumFractionDigits: digits,
+  }).format(value)} %`;
+}
+
+const compactFormatter = new Intl.NumberFormat('fr-FR', {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+});
+
+/**
+ * Montant ETH compact pour les totaux : « 8,5 », « 1,2 k », « 3 M ».
+ * @param {bigint|string|number|null|undefined} wei
+ */
+export function formatEthCompact(wei) {
+  if (wei === null || wei === undefined || wei === '') return EMPTY;
+
+  let value;
+  try {
+    value = Number(formatEther(BigInt(wei)));
+  } catch {
+    return EMPTY;
+  }
+
+  if (!Number.isFinite(value)) return EMPTY;
+  if (value === 0) return '0';
+  if (Math.abs(value) >= 1000) return compactFormatter.format(value);
+
+  return value.toLocaleString('fr-FR', {
+    maximumFractionDigits: value < 1 ? 3 : 2,
+  });
+}
+
+/**
+ * Montant en ETH utilisable dans un champ de saisie, sans séparateur de
+ * milliers et avec la virgule française : « 0,5 ».
+ * @param {bigint|string|number} wei
+ */
+export function ethInputValue(wei) {
+  try {
+    return formatEther(BigInt(wei)).replace('.', ',');
+  } catch {
+    return '';
+  }
+}
+
+/** « 2 j 14 h restantes », « moins d'une minute restante », « Terminée ». */
+export function timeLeftLabel(seconds) {
+  const total = Math.max(0, Math.floor(Number(seconds) || 0));
+  if (total === 0) return 'Terminée';
+  if (total < 60) return "moins d'une minute restante";
+
+  return `${formatDuration(total)} restantes`;
+}

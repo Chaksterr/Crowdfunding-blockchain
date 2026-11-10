@@ -72,6 +72,10 @@ export function mapContractError(error) {
     return 'Solde insuffisant pour payer les frais de transaction.';
   }
 
+  if (/Adresse de la fabrique introuvable/i.test(raw)) {
+    return "L'adresse de la fabrique n'est pas configurée. Lancez « npm run sync » puis rechargez la page.";
+  }
+
   if (/user rejected|user denied|action_rejected/i.test(raw)) {
     return 'Transaction annulée dans MetaMask.';
   }
