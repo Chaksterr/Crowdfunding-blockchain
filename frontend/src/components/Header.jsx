@@ -89,7 +89,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="order-2 ml-auto sm:order-none sm:ml-0">
+        <div className="order-2 ml-auto sm:order-none">
           <WalletButton />
         </div>
       </div>
