@@ -38,3 +38,6 @@ npm-debug.log*
 Thumbs.db
 .idea/
 *.swp
+
+# ===== Notes personnelles (non versionnées) =====
+private/
