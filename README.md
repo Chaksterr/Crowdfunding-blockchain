@@ -1,5 +1,7 @@
 # Plateforme de financement participatif sur blockchain
 
+**🌐 Langue / Language :** [Français](README.md) · [English](README.en.md)
+
 Application décentralisée de financement participatif. Un créateur lance une campagne avec un **objectif de montant** et une **date limite**. Les fonds sont gardés par un **Smart Contract** qui enregistre le créateur et les donateurs. Le créateur ne peut retirer l'argent qu'après un vote favorable des donateurs, et chaque donateur est remboursé si l'objectif n'est pas atteint.
 
 **Stack :** Solidity 0.8.24 · Hardhat · Hardhat Ignition · ethers.js v6 · React · Redux Toolkit · Tailwind CSS · MetaMask
@@ -366,3 +368,7 @@ Les tâches et les livrables de chaque étudiant sont dans ce README (sections 4
 | [docs/commun/CahierDesCharges.pdf](docs/commun/CahierDesCharges.pdf) | Tous | Cahier des charges officiel |
 | [docs/etudiant1-smart-contracts/phase1.md](docs/etudiant1-smart-contracts/phase1.md) | Tous, rapport | Phase 1 expliquée en détail : conception, chaque fonction, messages d'erreur, sécurité, tests, déploiement |
 | [docs/commun/GUIDE_METAMASK_HARDHAT.md](docs/commun/GUIDE_METAMASK_HARDHAT.md) | Étudiants 2, 3, 4 | Lancer la blockchain, configurer MetaMask, exemples ethers.js |
+| [docs/commun/GUIDE_DEPLOIEMENT.md](docs/commun/GUIDE_DEPLOIEMENT.md) | Tous | Guide complet de déploiement local : node, deploy, seed, frontend, dépannage |
+| [docs/commun/RECETTE.md](docs/commun/RECETTE.md) | Étudiant 4 | Recette des scénarios A à F, multi-PC, checklist de sortie |
+| [docs/commun/rapport/RAPPORT.md](docs/commun/rapport/RAPPORT.md) | Tous | Rapport de projet |
+| [docs/commun/presentation/PRESENTATION.md](docs/commun/presentation/PRESENTATION.md) | Tous | Slides de la soutenance et déroulé de la démo |
