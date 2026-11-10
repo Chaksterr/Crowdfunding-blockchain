@@ -131,7 +131,7 @@ export default function MyContributionsPage() {
             {contributions.map((project) => (
               <Card key={project.address} className="flex h-full flex-col">
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <h2 className="text-base font-semibold text-slate-900">
+                  <h2 className="text-lg font-semibold tracking-tight text-slate-900">
                     <Link
                       to={`/project/${project.address}`}
                       className="transition hover:text-indigo-700"

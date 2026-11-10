@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import PageHeader from "../components/ui/PageHeader";
 import Card from "../components/ui/Card";
 import Alert from "../components/ui/Alert";
 import Button, { buttonClass } from "../components/ui/Button";
@@ -68,12 +67,29 @@ export default function HomePage() {
 
   return (
     <div className="space-y-8 sm:space-y-10">
-      <PageHeader
-        eyebrow="Campagnes"
-        title="Des projets financés par la communauté"
-        description="Chaque campagne est un contrat autonome : les fonds sont bloqués jusqu'à la date limite, puis remboursés ou débloqués après un vote des donateurs."
-        actions={
-          <>
+      <section className="relative overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-amber-50 via-white to-emerald-50 px-6 py-10 shadow-sm sm:px-10 sm:py-12">
+        <span
+          className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 rounded-full bg-gradient-to-br from-emerald-200/50 to-teal-100/40"
+          aria-hidden="true"
+        />
+        <span
+          className="pointer-events-none absolute -bottom-24 left-1/3 h-56 w-56 rounded-full bg-gradient-to-tr from-amber-200/40 to-orange-100/30"
+          aria-hidden="true"
+        />
+        <div className="relative max-w-3xl">
+          <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700">
+            <span className="h-px w-6 bg-emerald-300" aria-hidden="true" />
+            Campagnes
+          </p>
+          <h1 className="text-balance text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+            Des projets financés par la communauté
+          </h1>
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-600 sm:text-base">
+            Chaque campagne est un contrat autonome : les fonds sont bloqués
+            jusqu'à la date limite, puis remboursés ou débloqués après un vote
+            des donateurs.
+          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-2">
             <Button
               variant="secondary"
               onClick={reload}
@@ -82,12 +98,12 @@ export default function HomePage() {
             >
               Actualiser
             </Button>
-            <Link to="/create" className={buttonClass({ variant: "primary" })}>
+            <Link to="/create" className={buttonClass({ variant: "primary", size: "lg" })}>
               Créer une campagne
             </Link>
-          </>
-        }
-      />
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Stat

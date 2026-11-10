@@ -6,19 +6,19 @@ const TONES = {
     dot: 'bg-slate-400',
   },
   indigo: {
-    chip: 'bg-indigo-50 text-indigo-700 ring-indigo-200',
+    chip: 'bg-indigo-100 text-indigo-800 ring-indigo-200',
     dot: 'bg-indigo-500',
   },
   ongoing: {
-    chip: 'bg-amber-50 text-amber-800 ring-amber-200',
+    chip: 'bg-amber-100 text-amber-800 ring-amber-200',
     dot: 'bg-amber-500',
   },
   success: {
-    chip: 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+    chip: 'bg-emerald-100 text-emerald-800 ring-emerald-200',
     dot: 'bg-emerald-500',
   },
   failed: {
-    chip: 'bg-rose-50 text-rose-700 ring-rose-200',
+    chip: 'bg-rose-100 text-rose-800 ring-rose-200',
     dot: 'bg-rose-500',
   },
 };

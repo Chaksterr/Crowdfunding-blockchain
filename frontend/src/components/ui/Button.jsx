@@ -1,11 +1,11 @@
 import Spinner from './Spinner';
 
 const BASE =
-  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 disabled:pointer-events-none disabled:opacity-50';
+  'inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50 disabled:pointer-events-none disabled:opacity-50';
 
 const VARIANTS = {
   primary:
-    'bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 active:bg-indigo-800',
+    'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20 hover:bg-emerald-700 hover:shadow-md hover:shadow-emerald-600/25 active:bg-emerald-800',
   secondary:
     'border border-slate-300 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900',
   ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',

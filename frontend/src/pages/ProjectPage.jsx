@@ -8,6 +8,8 @@ import Card from '../components/ui/Card';
 import EmptyState from '../components/ui/EmptyState';
 import Field from '../components/ui/Field';
 import Alert from '../components/ui/Alert';
+import CampaignBanner from '../components/CampaignBanner';
+import DonorAvatars from '../components/DonorAvatars';
 import CopyAddress from '../components/CopyAddress';
 import ProgressBar from '../components/ProgressBar';
 import { useToast } from '../components/ToastProvider';
@@ -28,6 +30,7 @@ import {
   ethInputValue,
   formatDeadline,
   formatEth,
+  formatPercent,
   parseEth,
   timeLeftLabel,
 } from '../web3/format';
@@ -71,6 +74,9 @@ function DonateCard({ project, onDone }) {
   const tx = useTransaction();
   const [amount, setAmount] = useState('');
   const [fieldError, setFieldError] = useState('');
+
+  const tone =
+    project.status === 2 ? 'success' : project.status === 1 ? 'failed' : 'primary';
 
   const quickAmounts = useMemo(() => {
     const min = project.minContribution;
@@ -171,14 +177,40 @@ function DonateCard({ project, onDone }) {
   };
 
   return (
-    <Card>
-      <h2 className="text-base font-semibold text-slate-900">
-        Donner à cette campagne
-      </h2>
-      <p className="mt-1 text-sm text-slate-600">
-        Don minimum : {formatEth(project.minContribution)} ETH. Les fonds sont
-        conservés par le contrat jusqu'à la date limite.
-      </p>
+    <Card padded={false} className="overflow-hidden shadow-lg ring-1 ring-slate-200/70">
+      <div className="border-b border-slate-100 bg-slate-50/60 p-5 sm:p-6">
+        <p className="text-3xl font-bold tracking-tight text-slate-900">
+          {formatEth(project.totalRaised)} ETH
+        </p>
+        <p className="mt-1 text-sm text-slate-500">
+          collectés sur un objectif de {formatEth(project.goal)} ETH
+        </p>
+        <ProgressBar
+          className="mt-3"
+          raised={project.totalRaised}
+          goal={project.goal}
+          tone={tone}
+        />
+        <div className="mt-3 flex items-center justify-between gap-3 text-sm">
+          <span className="flex min-w-0 items-center gap-2 text-slate-500">
+            <DonorAvatars donors={project.donors} />
+            {project.donors.length} donateur
+            {project.donors.length > 1 ? 's' : ''}
+          </span>
+          <span className="shrink-0 font-medium text-slate-600">
+            {formatPercent(project.totalRaised, project.goal)} de l'objectif
+          </span>
+        </div>
+      </div>
+
+      <div className="p-5 sm:p-6">
+        <h2 className="text-lg font-semibold tracking-tight text-slate-900">
+          Donner à cette campagne
+        </h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Don minimum : {formatEth(project.minContribution)} ETH. Les fonds sont
+          conservés par le contrat jusqu'à la date limite.
+        </p>
 
       {(project.contributions ?? 0n) > 0n ? (
         <p className="mt-3 rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-900">
@@ -219,6 +251,7 @@ function DonateCard({ project, onDone }) {
           {amount ? `Donner ${amount} ETH` : 'Donner'}
         </Button>
       </form>
+      </div>
     </Card>
   );
 }
@@ -381,7 +414,7 @@ function RequestCard({ request, project, isCreator, onDone }) {
           raised={BigInt(request.approvals)}
           goal={BigInt(Math.max(donorCount, 1))}
           label="Approbations de la demande"
-          tone={quorumReached ? 'success' : 'indigo'}
+          tone={quorumReached ? 'success' : 'primary'}
         />
       </div>
 
@@ -401,7 +434,6 @@ function RequestCard({ request, project, isCreator, onDone }) {
         {canVote ? (
           <Button
             size="sm"
-            variant="secondary"
             loading={tx.isPending}
             onClick={() =>
               run(
@@ -499,6 +531,7 @@ function RefundCard({ project, onDone }) {
 export default function ProjectPage() {
   const { address } = useParams();
   const wallet = useWallet();
+  const toast = useToast();
   const validAddress = isAddress(address);
 
   const { data: project, status, error, reload, isLoading } = useAsyncData(
@@ -555,38 +588,49 @@ export default function ProjectPage() {
     wallet.account.toLowerCase() === project.creator.toLowerCase();
   const seconds = secondsLeft(project.deadline);
   const tone =
-    project.status === 2 ? 'success' : project.status === 1 ? 'failed' : 'indigo';
+    project.status === 2 ? 'success' : project.status === 1 ? 'failed' : 'primary';
+
+  const shareCampaign = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success(
+        'Lien copié',
+        'Le lien de la campagne est dans le presse-papiers.',
+      );
+    } catch {
+      toast.error('Copie impossible', 'Le lien n’a pas pu être copié.');
+    }
+  };
 
   return (
     <div className="space-y-8">
-      <Link
-        to="/"
-        className="inline-flex items-center text-sm font-semibold text-slate-600 transition hover:text-indigo-700"
-      >
-        ← Toutes les campagnes
-      </Link>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Link
+          to="/"
+          className="inline-flex items-center text-sm font-semibold text-slate-600 transition hover:text-indigo-700"
+        >
+          ← Toutes les campagnes
+        </Link>
+        <Button variant="secondary" size="sm" onClick={shareCampaign}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            className="h-4 w-4"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M7.5 10.5v6.75A2.25 2.25 0 0 0 9.75 19.5h8.25a2.25 2.25 0 0 0 2.25-2.25V9a2.25 2.25 0 0 0-2.25-2.25H14.5m-7-4.25L4.5 5.5l3 2.75m0-5.5v5.5h5.5"
+            />
+          </svg>
+          Partager
+        </Button>
+      </div>
 
-      <header className="space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-            {project.title}
-          </h1>
-          <Badge status={project.status} />
-        </div>
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
-          <CopyAddress value={project.address} label="l'adresse de la campagne" />
-          <span>
-            Créateur : <CopyAddress value={project.creator} label="le créateur" chars={3} />
-          </span>
-          <span>Date limite : {formatDeadline(project.deadline)}</span>
-          <span>{timeLeftLabel(seconds)}</span>
-        </div>
-        <ProgressBar
-          raised={project.totalRaised}
-          goal={project.goal}
-          tone={tone}
-        />
-      </header>
+      <CampaignBanner address={project.address} size="lg" />
 
       {status === 'error' ? (
         <Alert tone="amber" title="Données peut-être obsolètes">
@@ -594,13 +638,43 @@ export default function ProjectPage() {
         </Alert>
       ) : null}
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-6">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-8">
+        <aside className="space-y-6 order-first lg:order-2">
+          <div className="lg:sticky lg:top-24 lg:h-fit lg:space-y-6">
+            <DonateCard project={project} onDone={reload} />
+            {project.status === 1 && (project.contributions ?? 0n) > 0n ? (
+              <RefundCard project={project} onDone={reload} />
+            ) : null}
+          </div>
+        </aside>
+
+        <div className="space-y-6 lg:order-1">
+          <header className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                {project.title}
+              </h1>
+              <Badge status={project.status} />
+            </div>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-600">
+              <CopyAddress value={project.address} label="l'adresse de la campagne" />
+              <span>
+                Créateur : <CopyAddress value={project.creator} label="le créateur" chars={3} />
+              </span>
+              <span>Date limite : {formatDeadline(project.deadline)}</span>
+              <span>{timeLeftLabel(seconds)}</span>
+            </div>
+            <ProgressBar
+              raised={project.totalRaised}
+              goal={project.goal}
+              tone={tone}
+            />
+          </header>
           <Card>
-            <h2 className="text-base font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold tracking-tight text-slate-900">
               À propos du projet
             </h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-6 text-slate-600">
+            <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-slate-600">
               {project.description}
             </p>
 
@@ -626,7 +700,7 @@ export default function ProjectPage() {
 
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">
                 Demande{project.withdrawRequests.length > 1 ? 's' : ''} de retrait
               </h2>
               <span className="text-xs text-slate-500">
@@ -663,7 +737,7 @@ export default function ProjectPage() {
 
           <Card>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-base font-semibold text-slate-900">
+              <h2 className="text-lg font-semibold tracking-tight text-slate-900">
                 Donateurs
               </h2>
               <span className="text-xs text-slate-500">
@@ -682,7 +756,8 @@ export default function ProjectPage() {
                     key={donor.address}
                     className="flex items-center justify-between gap-4 py-2.5"
                   >
-                    <span className="flex min-w-0 items-center gap-2">
+                    <span className="flex min-w-0 items-center gap-2.5">
+                      <DonorAvatars donors={[donor]} max={1} />
                       <CopyAddress
                         value={donor.address}
                         label="l'adresse du donateur"
@@ -712,13 +787,6 @@ export default function ProjectPage() {
             ) : null}
           </Card>
         </div>
-
-        <aside className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
-          <DonateCard project={project} onDone={reload} />
-          {project.status === 1 && (project.contributions ?? 0n) > 0n ? (
-            <RefundCard project={project} onDone={reload} />
-          ) : null}
-        </aside>
       </div>
     </div>
   );

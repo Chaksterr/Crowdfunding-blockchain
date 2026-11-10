@@ -1,9 +1,10 @@
 import { formatPercent, percent } from '../web3/format';
 
 const TONES = {
-  indigo: 'bg-indigo-600',
-  success: 'bg-emerald-500',
+  primary: 'bg-gradient-to-r from-emerald-500 to-emerald-600',
+  success: 'bg-gradient-to-r from-emerald-500 to-emerald-600',
   failed: 'bg-rose-500',
+  indigo: 'bg-gradient-to-r from-indigo-500 to-indigo-600',
 };
 
 /**
@@ -12,7 +13,7 @@ const TONES = {
 export default function ProgressBar({
   raised,
   goal,
-  tone = 'indigo',
+  tone = 'primary',
   label = 'Progression de la collecte',
   className = '',
 }) {
@@ -27,11 +28,11 @@ export default function ProgressBar({
       aria-valuemax={100}
       aria-valuenow={rounded}
       aria-valuetext={formatPercent(raised, goal)}
-      className={`h-2 w-full overflow-hidden rounded-full bg-slate-100 ${className}`}
+      className={`h-2.5 w-full overflow-hidden rounded-full bg-slate-100 ${className}`}
     >
       <div
         className={`h-full rounded-full transition-[width] duration-500 ${
-          TONES[tone] ?? TONES.indigo
+          TONES[tone] ?? TONES.primary
         }`}
         style={{
           width: `${value}%`,
