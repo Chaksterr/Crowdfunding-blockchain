@@ -89,12 +89,13 @@ Insister : pas de `transfer`, pas de `nonReentrant` nécessaire grâce à l'ordr
 
 ## Slide 9 — Tests
 
-- **47 tests** : 42 `Project` + 5 `Crowdfunding`.
+- **82 tests de contrat** : 42 `Project`, 12 `Crowdfunding`, 24 valeurs limites et invariants, 4 cycles de vie complets.
 - **100 %** de couverture (lignes, branches, fonctions, statements).
+- **198 tests frontend** (Vitest) et **12 tests de bout en bout** (Playwright) qui rejouent les scénarios A à F dans un vrai navigateur.
 - Tests de sécurité : contrat attaquant, récepteur qui refuse, double action.
-- Commande : `npm test` (démonstration possible).
+- Commandes : `npm test` et `npm run e2e` (démonstration possible).
 
-Visuel : capture du terminal « 47 passing ».
+Visuel : capture du terminal « 82 passing » et du résultat Playwright « 12 passed ».
 
 ## Slide 10 — Déploiement
 

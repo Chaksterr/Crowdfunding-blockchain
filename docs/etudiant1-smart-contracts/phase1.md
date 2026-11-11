@@ -30,7 +30,7 @@ Ce document explique ce qui a été réalisé dans la Phase 1, comment c'est con
 | --- | --- |
 | Contrats `Crowdfunding.sol` et `Project.sol` | ✅ F1 à F6 et RG1 à RG5 implémentées |
 | Sécurité (réentrance, contrôle d'accès, vote, double vote) | ✅ implémentée et testée |
-| Tests unitaires Mocha/Chai | ✅ 47 tests réussis, couverture 100 % (lignes et branches) |
+| Tests unitaires Mocha/Chai | ✅ 47 tests réussis en fin de phase 1 (82 aujourd'hui), couverture 100 % (lignes et branches) |
 | Déploiement Hardhat Ignition | ✅ `ignition/modules/Crowdfunding.js` |
 | Outils pour la démo et le frontend | ✅ `simulate`, `ff`, `sync` |
 
@@ -276,7 +276,7 @@ Il n'existe que deux façons de faire sortir de l'ETH d'un `Project` : `withdraw
 
 ## 7. Tests
 
-`npm test` lance **47 tests**, tous réussis. `npm run coverage` donne **100 %** de couverture des lignes et des branches sur les deux contrats.
+`npm test` lance aujourd'hui **82 tests**, tous réussis : les 47 de la phase 1, détaillés ci-dessous, et 35 tests ajoutés ensuite (fabrique, valeurs limites, invariants, cycle de vie complet). `npm run coverage` donne **100 %** de couverture des lignes et des branches sur les deux contrats.
 
 | Groupe | Nombre | Ce qui est vérifié |
 | --- | --- | --- |
@@ -317,7 +317,7 @@ Sur un node local neuf, la fabrique est toujours déployée à la même adresse 
 
 ```bash
 npm install
-npm test              # attendu : 47 passing
+npm test              # attendu : 82 passing
 npm run coverage      # attendu : 100 % sur Crowdfunding.sol et Project.sol
 ```
 

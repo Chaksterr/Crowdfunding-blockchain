@@ -132,7 +132,7 @@ sequenceDiagram
 | **Portefeuille** | MetaMask | extension | Signature des transactions |
 | **Qualité** | GitHub Actions | | Intégration continue : compilation, tests, couverture, build |
 | | Hook Git `pre-commit` | | Compilation, tests et contrôles avant chaque commit |
-| **Environnement** | Node.js + npm | 18 ou plus | Exécution de tous les outils |
+| **Environnement** | Node.js + npm | 22 ou plus (24 dans la CI) | Exécution de tous les outils |
 
 ---
 
@@ -280,7 +280,7 @@ L'état n'est jamais stocké : `getStatus()` le recalcule à chaque lecture à p
 ### Prérequis
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) 18 ou plus (version LTS conseillée), avec npm
+- [Node.js](https://nodejs.org/) 22 ou plus (version LTS ; la CI utilise Node 24), avec npm
 - L'extension [MetaMask](https://metamask.io/) dans le navigateur
 
 ### Étape 1 — Cloner le dépôt

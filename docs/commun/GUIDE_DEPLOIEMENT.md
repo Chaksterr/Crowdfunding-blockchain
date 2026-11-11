@@ -1,6 +1,6 @@
 # Guide de déploiement local
 
-Ce guide décrit comment lancer la plateforme de financement participatif **de zéro sur un ordinateur**, puis comment rejouer la démo avec les données de test. Il complète le [README](../../README.md) (sections 0 et 7) et le [guide MetaMask & Hardhat](GUIDE_METAMASK_HARDHAT.md).
+Ce guide décrit comment lancer la plateforme de financement participatif **de zéro sur un ordinateur**, puis comment rejouer la démo avec les données de test. Il complète le [README](../../README.md#6-installation) (section 6 « Installation ») et le [guide MetaMask & Hardhat](GUIDE_METAMASK_HARDHAT.md).
 
 > Toutes les commandes se lancent depuis la **racine du projet** (`plateforme-crowdfunding-blockchain/`), sauf mention contraire.
 
@@ -9,7 +9,7 @@ Ce guide décrit comment lancer la plateforme de financement participatif **de z
 ## 1. Prérequis
 
 - **Git**
-- **Node.js 18 ou plus** (LTS) et `npm`
+- **Node.js 22 ou plus** (LTS ; la CI utilise Node 24) et `npm`
 - **MetaMask** installé dans le navigateur (extension)
 - Deux terminaux ouverts dans le dossier du projet
 
@@ -22,7 +22,7 @@ git clone https://github.com/Chaksterr/plateforme-crowdfunding-blockchain.git
 cd plateforme-crowdfunding-blockchain
 
 npm install          # dépendances Hardhat / Ignition / ethers
-npm test             # contrôle : doit afficher 47 passing
+npm test             # contrôle : doit afficher 82 passing
 ```
 
 > Si `npm test` ne passe pas, arrêtez-vous ici : l'environnement n'est pas prêt.
@@ -184,7 +184,8 @@ Puis dans MetaMask : **Effacer les données d'activité** pour chaque compte imp
 
 ```bash
 npm install            # une seule fois
-npm test               # 47 tests
+npm test               # 82 tests des contrats
+npm run e2e            # scénarios A à F dans un vrai navigateur (12 tests)
 npm run node           # terminal 1 : blockchain locale
 npm run deploy         # terminal 2 : déploie la fabrique
 npm run deploy:reset   # redéploie après un redémarrage
@@ -194,4 +195,4 @@ npm run simulate       # scénarios A et B sans interface
 SECONDS=120 npm run ff # avance l'horloge de 120 s
 ```
 
-Voir aussi : [README](../../README.md) sections 0 et 7, [GUIDE_METAMASK_HARDHAT.md](GUIDE_METAMASK_HARDHAT.md).
+Voir aussi : [README](../../README.md#6-installation) (section 6 « Installation »), [GUIDE_METAMASK_HARDHAT.md](GUIDE_METAMASK_HARDHAT.md).

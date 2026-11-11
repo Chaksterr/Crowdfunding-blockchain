@@ -132,7 +132,7 @@ sequenceDiagram
 | **Wallet** | MetaMask | extension | Signing transactions |
 | **Quality** | GitHub Actions | | Continuous integration: compile, test, coverage, build |
 | | Git `pre-commit` hook | | Compile, tests and checks before every commit |
-| **Environment** | Node.js + npm | 18 or later | Running all the tools |
+| **Environment** | Node.js + npm | 22 or later (24 in CI) | Running all the tools |
 
 ---
 
@@ -282,7 +282,7 @@ The interface is in French.
 ### Prerequisites
 
 - [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) 18 or later (LTS recommended), with npm
+- [Node.js](https://nodejs.org/) 22 or later (LTS; CI uses Node 24), with npm
 - The [MetaMask](https://metamask.io/) browser extension
 
 ### Step 1 — Clone the repository

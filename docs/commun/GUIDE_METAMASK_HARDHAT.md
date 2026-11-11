@@ -32,17 +32,19 @@ npm run compile
 npm run test
 ```
 
-- **Ce qui se passe :** Hardhat exécute **31 tests automatisés** couvrant :
-  - La fabrique `Crowdfunding` (4 tests)
+- **Ce qui se passe :** Hardhat exécute **82 tests automatisés** couvrant :
+  - La fabrique `Crowdfunding` (12 tests)
   - Le déploiement et les règles RG1 (5 tests)
   - Les dons et règles RG2 (5 tests)
   - Le calcul des états `Ongoing / Successful / Failed` et du temps (4 tests)
   - Les demandes de retrait et autorisations (6 tests)
   - Le système de vote à 50 % et retrait effectif (12 tests)
-  - Les remboursements en cas d'échec RG5 et protection anti-réentrance (7 tests)
+  - Les remboursements en cas d'échec RG5 (7 tests) et la sécurité : réentrance, virements refusés (3 tests)
+  - Les valeurs limites et les invariants (24 tests)
+  - Le cycle de vie complet via la fabrique (4 tests)
 - **Résultat attendu :**
   ```text
-  31 passing (X s)
+  82 passing (1s)
   ```
   Tous les tests doivent être au vert.
 
@@ -388,7 +390,7 @@ Pour une UX intuitive, activez les boutons selon le tableau suivant :
 ## 4. Checklist Finale pour Vos Amis
 
 Avant de coder le frontend, assurez-vous d'avoir :
-- [x] Node.js v18 ou plus récent installé.
+- [x] Node.js v22 ou plus récent installé (la CI utilise Node 24).
 - [x] Démarré le nœud local : `npm run node` (Terminal 1).
 - [x] Déployé la fabrique : `npm run deploy` (Terminal 2).
 - [x] Synchronisé les ABI : `npm run sync`.
