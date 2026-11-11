@@ -122,6 +122,7 @@ sequenceDiagram
 | **Tests** | Mocha + Chai | 11 / 4 | Tests des contrats |
 | | solidity-coverage | 0.8 | Couverture de code des contrats |
 | | Vitest + Testing Library + jsdom | 2.1 / 16 / 25 | Tests de l'application web |
+| | Playwright | 1.64 | Tests de bout en bout dans Chromium : scénarios A à F |
 | **Frontend** | React | 18.3 | Interface utilisateur |
 | | Vite | 5.4 | Serveur de développement et build |
 | | Tailwind CSS | 3.4 | Mise en forme |
@@ -149,6 +150,10 @@ plateforme-crowdfunding-blockchain/
 │   ├── Project.js                     # chaque fonction d'une campagne, sécurité
 │   ├── ProjectBoundaries.js           # valeurs limites et invariants
 │   └── Lifecycle.js                   # parcours complets de bout en bout
+├── e2e/                               # tests de bout en bout (Playwright)
+│   ├── playwright.config.js           # nœud Hardhat, build de l'application, Chromium
+│   ├── support/                       # portefeuille de test, accès à la blockchain
+│   └── tests/                         # scénarios A à F, réseau, captures d'écran
 ├── ignition/modules/
 │   └── Crowdfunding.js                # déploiement avec Hardhat Ignition
 ├── scripts/
@@ -179,6 +184,7 @@ plateforme-crowdfunding-blockchain/
 │   │   ├── GUIDE_DEPLOIEMENT.md       # déploiement local détaillé, dépannage
 │   │   ├── GUIDE_METAMASK_HARDHAT.md  # configuration de MetaMask
 │   │   ├── RECETTE.md                 # scénarios de test manuels A à F
+│   │   ├── captures/                  # captures d'écran (npm run e2e:captures)
 │   │   ├── rapport/                   # rapport du projet
 │   │   └── presentation/              # présentation et scénario de démo
 │   └── etudiant1-smart-contracts/
@@ -327,7 +333,9 @@ npm run dev     # http://localhost:5173
 | `npm run simulate` | Rejoue les scénarios A (réussite) et B (échec) dans le terminal |
 | `SECONDS=120 npm run ff` | Avance l'horloge de la blockchain de 120 secondes, par exemple pour terminer une campagne |
 | `npm run deploy:reset` | Redéploie la fabrique après un redémarrage du nœud |
-| `npm test` (dans `frontend/`) | Tests de l'application web : 191 tests |
+| `npm test` (dans `frontend/`) | Tests de l'application web : 198 tests |
+| `npm run e2e` | Tests de bout en bout : scénarios A à F dans Chromium (la première fois : `npx playwright install chromium`) |
+| `npm run e2e:captures` | Régénère les captures d'écran du rapport dans `docs/commun/captures/` |
 | `npm run build` (dans `frontend/`) | Build de production |
 
 Guide détaillé (multi-PC, dépannage) : [docs/commun/GUIDE_DEPLOIEMENT.md](docs/commun/GUIDE_DEPLOIEMENT.md).

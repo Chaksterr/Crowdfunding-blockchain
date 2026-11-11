@@ -4,6 +4,37 @@
 > Comptes : **Créateur** = compte #0, **D1** = #1, **D2** = #2, **D3** = #3. Tous ont 10 000 ETH de test.
 > Après chaque redémarrage de `npm run node` : MetaMask → Paramètres → Avancé → **Effacer les données d'activité**.
 
+## Recette automatisée (Playwright)
+
+Les scénarios A à F sont aussi rejoués automatiquement dans un vrai navigateur (Chromium), sur une blockchain Hardhat neuve et avec le build de production de l'application :
+
+```bash
+npx playwright install chromium   # une seule fois
+npm run e2e                       # 12 tests, environ 30 secondes
+```
+
+Un portefeuille de test remplace l'extension MetaMask : il répond comme MetaMask (comptes, réseau, changement de compte) et fait signer les transactions par le nœud Hardhat, sans clé privée dans le code. Le scénario A se joue comme en démo : un seul navigateur, avec un changement de compte entre chaque étape.
+
+| Scénario | Test | Vérifié automatiquement |
+| --- | --- | --- |
+| A | `e2e/tests/scenario-a.spec.js` | 3 dons de 2 ETH depuis trois comptes, demande de 4 ETH, 2 votes sur 3, retrait : le destinataire reçoit exactement 4 ETH |
+| B | `e2e/tests/scenario-b.spec.js` | Objectif 50 ETH, dons de 1 et 2 ETH : chaque donateur récupère sa mise (moins le gaz), le contrat finit à 0 ETH |
+| C | `e2e/tests/scenario-c.spec.js` | Don sous le minimum refusé avant l'envoi ; don après la date limite refusé par le contrat avec « La campagne est terminée : les dons sont fermés. » ; formulaire masqué une fois la campagne finie |
+| D | `e2e/tests/scenario-d.spec.js` | 1 vote sur 3 : pas de bouton « Retirer », et le contrat refuse l'appel direct |
+| E | `e2e/tests/scenario-e.spec.js` | Double vote, retrait par un non-créateur, double remboursement : actions absentes de l'interface et refusées par le contrat |
+| F | `e2e/tests/scenario-f.spec.js` | Sans MetaMask : lecture des campagnes, aucune action d'écriture |
+| Réseau | `e2e/tests/wallet.spec.js` | Connexion du portefeuille ; sur un autre réseau, aucune transaction n'est envoyée et un message clair s'affiche |
+
+**Résultat au 11/11/2026 : 12 tests sur 12 réussis.** Le job `e2e` de la CI GitHub Actions les relance à chaque push. Les captures d'écran du rapport (ordinateur et téléphone) se régénèrent avec `npm run e2e:captures`, dans `docs/commun/captures/`.
+
+Bugs trouvés par cette recette et corrigés dans `frontend/src/` :
+
+1. Après un changement de compte dans MetaMask, l'écran « Merci ! » du compte précédent restait affiché et cachait Donner, Voter, Retirer ou Rembourser jusqu'au rechargement de la page. Le scénario A était bloqué en démo.
+2. Avec MetaMask sur un autre réseau, Voter, Retirer, Rembourser et Créer la demande envoyaient quand même la transaction, vers ce réseau.
+3. Après `npm run ff`, le compte à rebours suivait l'horloge du navigateur et affichait encore des minutes restantes à côté du badge « Réussie ».
+
+Restent manuels : les fenêtres de confirmation de la vraie extension MetaMask et le test multi-PC (sections ci-dessous).
+
 ## Préparation
 
 ```bash
