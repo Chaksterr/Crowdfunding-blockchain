@@ -29,6 +29,10 @@ ignition/deployments/
 frontend/dist/
 frontend/.vite/
 
+# ===== Tests de bout en bout (Playwright) =====
+# Build de test, rapports, traces et captures d'échec : régénérés à chaque lancement.
+e2e/output/
+
 # ===== Logs =====
 *.log
 npm-debug.log*
