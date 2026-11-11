@@ -1,7 +1,8 @@
 # Rapport de projet — Plateforme de financement participatif sur blockchain
 
-**Équipe :** 4 étudiants
-**Stack :** Solidity 0.8.24 · Hardhat · Hardhat Ignition · ethers.js v6 · React · Redux Toolkit · Tailwind CSS · MetaMask
+**Équipe :** Yessine Abdelmaksoud · Mohamed Ali Abid · Ahmad Chakcha · Mohamed Ali Djemal\
+**Date :** novembre 2026\
+**Stack :** Solidity 0.8.24 · Hardhat · Hardhat Ignition · ethers.js v6 · React · Redux Toolkit · Tailwind CSS · MetaMask\
 **Réseau de démonstration :** Hardhat local, chainId `31337`
 
 ---
@@ -70,7 +71,7 @@ Trois choix ont été faits pour simplifier le contrat sans réduire les garanti
 ## 3. Architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
     U["Utilisateur<br/>Créateur · Donateur · Visiteur"]
     subgraph FRONT["frontend/"]
         UI["React + Tailwind"]
@@ -118,13 +119,19 @@ Le créateur enregistré est `msg.sender`. La fabrique ne conserve aucun ETH et 
 **Cycle de vie :**
 
 ```mermaid
-stateDiagram-v2
-    [*] --> EnCours: createProject()
-    EnCours --> EnCours: contribute()
-    EnCours --> Reussie: date limite passée, total >= objectif
-    EnCours --> Echouee: date limite passée, total < objectif
-    Reussie --> Reussie: demande, votes, retrait si >= 50 %
-    Echouee --> Echouee: refund() par chaque donateur
+flowchart TB
+    S0(("&nbsp;")) -->|"createProject()"| EC("<b>En cours</b><br/>les donateurs appellent contribute()")
+    EC -->|"date limite passée,<br/>total ≥ objectif"| R("<b>Réussie</b><br/>demandes de retrait, votes,<br/>retrait si ≥ 50 % des donateurs")
+    EC -->|"date limite passée,<br/>total < objectif"| E("<b>Échouée</b><br/>chaque donateur appelle refund()<br/>et récupère sa mise")
+
+    classDef startPoint fill:#334155,stroke:#334155
+    classDef ongoing fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef success fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef failed fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    class S0 startPoint
+    class EC ongoing
+    class R success
+    class E failed
 ```
 
 L'état est calculé :
@@ -381,9 +388,8 @@ Chaque correction est couverte par des tests unitaires, qui échouent tous sur l
 
 ### 7.4 Limites de la validation
 
-- Le portefeuille de test remplace l'extension : les fenêtres de confirmation de la vraie extension MetaMask restent à vérifier à la main, avec la fiche `RECETTE.md`.
-- Le multi-PC (`--hostname 0.0.0.0` + `--host`) est documenté mais n'a pas été mesuré dans cet environnement.
-- La vidéo de secours reste à produire par l'équipe. Les captures d'écran sont faites (section 6.4) et se régénèrent avec `npm run e2e:captures`.
+- Les tests de bout en bout utilisent un portefeuille de test à la place de l'extension MetaMask : ils ne couvrent pas ses fenêtres de confirmation, qui relèvent de la recette manuelle décrite dans `RECETTE.md`.
+- Le mode multi-PC (`--hostname 0.0.0.0` et `--host`) est décrit dans le guide de déploiement mais n'est pas couvert par les tests automatisés.
 
 ---
 

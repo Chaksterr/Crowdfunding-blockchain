@@ -161,6 +161,7 @@ plateforme-crowdfunding-blockchain/
 │   ├── seedDemo.js                    # creates 3 demo campaigns
 │   ├── simulate.js                    # replays scenarios A and B in the terminal
 │   ├── fastForward.js                 # moves the local blockchain clock forward
+│   ├── exportReport.js                # exports the report to PDF
 │   └── precommit.sh                   # checks run before every commit
 ├── frontend/                          # web application (React + Vite)
 │   ├── index.html
@@ -219,17 +220,19 @@ Frontend tests (`*.test.js`, `*.test.jsx`) sit next to the files they test. The 
 ### Campaign lifecycle
 
 ```mermaid
-stateDiagram-v2
-    state "Ongoing" as Ongoing
-    state "Successful" as Successful
-    state "Failed" as Failed
+flowchart TB
+    S0(("&nbsp;")) -->|"createProject()"| ON("<b>Ongoing</b><br/>donors call contribute()")
+    ON -->|"deadline passed,<br/>goal reached"| OK("<b>Successful</b><br/>withdrawal requests, votes,<br/>withdrawal if at least 50% of donors")
+    ON -->|"deadline passed,<br/>goal not reached"| KO("<b>Failed</b><br/>each donor calls refund()<br/>and gets their money back")
 
-    [*] --> Ongoing: createProject()
-    Ongoing --> Ongoing: contribute()
-    Ongoing --> Successful: deadline passed, goal reached
-    Ongoing --> Failed: deadline passed, goal not reached
-    Successful --> Successful: request, votes, withdrawal if at least 50%
-    Failed --> Failed: refund() by each donor
+    classDef startPoint fill:#334155,stroke:#334155
+    classDef ongoing fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef success fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef failed fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    class S0 startPoint
+    class ON ongoing
+    class OK success
+    class KO failed
 ```
 
 The state is never stored: `getStatus()` recomputes it on every read from the current time and the total raised.
@@ -345,6 +348,7 @@ npm run dev     # http://localhost:5173
 | `npm test` (in `frontend/`) | Web application tests: 198 tests |
 | `npm run e2e` | End-to-end tests: scenarios A to F in Chromium (first time: `npx playwright install chromium`) |
 | `npm run e2e:captures` | Regenerates the report screenshots in `docs/commun/captures/` |
+| `npm run report:pdf` | Regenerates the report PDF (`docs/commun/rapport/RAPPORT.pdf`) |
 | `npm run build` (in `frontend/`) | Production build |
 
 Detailed guide (multi-PC, troubleshooting, in French): [docs/commun/GUIDE_DEPLOIEMENT.md](docs/commun/GUIDE_DEPLOIEMENT.md).

@@ -161,6 +161,7 @@ plateforme-crowdfunding-blockchain/
 │   ├── seedDemo.js                    # crée 3 campagnes de démonstration
 │   ├── simulate.js                    # rejoue les scénarios A et B dans le terminal
 │   ├── fastForward.js                 # avance l'horloge de la blockchain locale
+│   ├── exportReport.js                # exporte le rapport en PDF
 │   └── precommit.sh                   # vérifications lancées avant chaque commit
 ├── frontend/                          # application web (React + Vite)
 │   ├── index.html
@@ -219,17 +220,19 @@ Les tests du frontend (`*.test.js`, `*.test.jsx`) sont placés à côté des fic
 ### Cycle de vie d'une campagne
 
 ```mermaid
-stateDiagram-v2
-    state "En cours" as EnCours
-    state "Réussie" as Reussie
-    state "Échouée" as Echouee
+flowchart TB
+    S0(("&nbsp;")) -->|"createProject()"| EC("<b>En cours</b><br/>les donateurs appellent contribute()")
+    EC -->|"date limite passée,<br/>objectif atteint"| R("<b>Réussie</b><br/>demandes de retrait, votes,<br/>retrait si au moins 50 % des donateurs")
+    EC -->|"date limite passée,<br/>objectif non atteint"| E("<b>Échouée</b><br/>chaque donateur appelle refund()<br/>et récupère sa mise")
 
-    [*] --> EnCours: createProject()
-    EnCours --> EnCours: contribute()
-    EnCours --> Reussie: date limite passée, objectif atteint
-    EnCours --> Echouee: date limite passée, objectif non atteint
-    Reussie --> Reussie: demande, votes, retrait si au moins 50 %
-    Echouee --> Echouee: refund() par chaque donateur
+    classDef startPoint fill:#334155,stroke:#334155
+    classDef ongoing fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef success fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef failed fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
+    class S0 startPoint
+    class EC ongoing
+    class R success
+    class E failed
 ```
 
 L'état n'est jamais stocké : `getStatus()` le recalcule à chaque lecture à partir de l'heure et du total collecté.
@@ -343,6 +346,7 @@ npm run dev     # http://localhost:5173
 | `npm test` (dans `frontend/`) | Tests de l'application web : 198 tests |
 | `npm run e2e` | Tests de bout en bout : scénarios A à F dans Chromium (la première fois : `npx playwright install chromium`) |
 | `npm run e2e:captures` | Régénère les captures d'écran du rapport dans `docs/commun/captures/` |
+| `npm run report:pdf` | Régénère le PDF du rapport (`docs/commun/rapport/RAPPORT.pdf`) |
 | `npm run build` (dans `frontend/`) | Build de production |
 
 Guide détaillé (multi-PC, dépannage) : [docs/commun/GUIDE_DEPLOIEMENT.md](docs/commun/GUIDE_DEPLOIEMENT.md).
