@@ -263,6 +263,13 @@ L'état n'est jamais stocké : `getStatus()` le recalcule à chaque lecture à p
 - **Retours clairs** : aperçu de la transaction avant signature, notifications de succès ou d'échec, erreurs du contrat traduites en français.
 - **Responsive** : utilisable sur téléphone comme sur ordinateur.
 
+<p align="center">
+  <img src="docs/commun/captures/01-accueil-ordinateur.png" alt="Accueil : statistiques et campagnes en cours" height="220">
+  <img src="docs/commun/captures/04-campagne-reussie-vote-ordinateur.png" alt="Campagne réussie : vote des donateurs et retrait" height="220">
+  <img src="docs/commun/captures/03-campagne-en-cours-telephone.png" alt="Page d'une campagne sur téléphone" height="220">
+</p>
+<p align="center"><em>Accueil · vote et retrait · version téléphone. Toutes les captures : <a href="docs/commun/captures/">docs/commun/captures/</a>.</em></p>
+
 ---
 
 ## 6. Installation

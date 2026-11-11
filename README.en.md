@@ -265,6 +265,13 @@ The state is never stored: `getStatus()` recomputes it on every read from the cu
 
 The interface is in French.
 
+<p align="center">
+  <img src="docs/commun/captures/01-accueil-ordinateur.png" alt="Home: statistics and ongoing campaigns" height="220">
+  <img src="docs/commun/captures/04-campagne-reussie-vote-ordinateur.png" alt="Successful campaign: donor vote and withdrawal" height="220">
+  <img src="docs/commun/captures/03-campagne-en-cours-telephone.png" alt="Campaign page on a phone" height="220">
+</p>
+<p align="center"><em>Home · vote and withdrawal · phone version. All screenshots: <a href="docs/commun/captures/">docs/commun/captures/</a>.</em></p>
+
 ---
 
 ## 6. Installation

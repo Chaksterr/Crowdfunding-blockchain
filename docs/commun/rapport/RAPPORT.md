@@ -280,6 +280,43 @@ Le slice Redux contient `{ status, account, chainId, balance, error }`. Au monta
 - **Détail** : en-tête avec badge d'état, adresses copiables, date limite et temps restant ; métriques (objectif, collecté, solde du contrat, minimum, donateurs, demandes) ; description ; formulaire de don avec montants rapides ; liste des donateurs ; demandes de retrait avec barre d'approbation ; boutons Voter/Retirer selon le rôle et le quorum ; carte de remboursement si la campagne a échoué ; abonnement aux cinq événements du contrat et polling de 15 s.
 - **Mes contributions** : liste les campagnes où `contributions(compte) > 0`, avec le montant personnel et le statut. Une contribution remboursée disparaît de la liste, conformément au contrat.
 
+#### Captures d'écran
+
+Les captures sont produites par `npm run e2e:captures` : une blockchain locale neuve, des données de démonstration proches de `npm run seed`, puis chaque page en 1280 × 800 sur ordinateur et en 390 × 844 sur téléphone. Toutes les images sont dans `docs/commun/captures/`.
+
+![Accueil](../captures/01-accueil-ordinateur.png)
+
+*Figure 1 — Accueil : statistiques globales, filtres par état et campagnes en cours.*
+
+![Création d'une campagne](../captures/02-creer-une-campagne-ordinateur.png)
+
+*Figure 2 — Création d'une campagne : formulaire, durées rapides et récapitulatif.*
+
+![Campagne en cours](../captures/03-campagne-en-cours-ordinateur.png)
+
+*Figure 3 — Campagne en cours : progression, compte à rebours et formulaire de don avec montants proposés.*
+
+![Vote et retrait](../captures/04-campagne-reussie-vote-ordinateur.png)
+
+*Figure 4 — Campagne réussie, vue du créateur : demande de retrait approuvée par 2 donateurs sur 3 (quorum atteint) et bouton « Retirer ».*
+
+![Remboursement](../captures/05-campagne-echouee-remboursement-ordinateur.png)
+
+*Figure 5 — Campagne échouée, vue d'un donateur : remboursement de sa contribution de 2 ETH.*
+
+![Mes contributions](../captures/06-mes-contributions-ordinateur.png)
+
+*Figure 6 — Mes contributions : total donné par le compte connecté et état de chaque campagne soutenue.*
+
+<p align="center">
+  <img src="../captures/01-accueil-telephone.png" alt="Accueil sur téléphone" width="24%">
+  <img src="../captures/03-campagne-en-cours-telephone.png" alt="Campagne en cours sur téléphone" width="24%">
+  <img src="../captures/04-campagne-reussie-vote-telephone.png" alt="Vote et retrait sur téléphone" width="24%">
+  <img src="../captures/05-campagne-echouee-remboursement-telephone.png" alt="Remboursement sur téléphone" width="24%">
+</p>
+
+*Figure 7 — Les mêmes pages sur téléphone (390 px de large) : accueil, campagne en cours, vote et retrait, remboursement.*
+
 ### 6.5 Gestion des erreurs et accessibilité
 
 Les 20 messages `require` du contrat sont traduits en français dans `web3/errors.js`, ainsi que le refus MetaMask (code 4001), les fonds insuffisants et l'absence de RPC. Les transactions affichent un état `pending`, désactivent le bouton et rafraîchissent les données après confirmation. Les toasts sont accessibles (`aria-live`, fermeture au clavier), les formulaires associent label, hint et erreur (`aria-invalid`, `aria-describedby`), les barres de progression exposent `role="progressbar"` et les pages restent utilisables à 360 px.
@@ -316,7 +353,7 @@ La vérification automatisée repose sur 47 tests de contrat (100 % de couvertur
 
 - Les tests frontend mockent la couche contrats : ils vérifient le comportement de l'interface, pas la signature réelle d'une transaction MetaMask.
 - Le multi-PC (`--hostname 0.0.0.0` + `--host`) est documenté mais n'a pas été mesuré dans cet environnement.
-- Les captures d'écran et la vidéo de secours restent à produire par l'équipe.
+- La vidéo de secours reste à produire par l'équipe. Les captures d'écran sont faites (section 6.4) et se régénèrent avec `npm run e2e:captures`.
 
 ---
 
