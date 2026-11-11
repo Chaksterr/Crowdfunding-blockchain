@@ -1,7 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { mapContractError, MISSING_METAMASK_MESSAGE } from './errors';
+import {
+  mapContractError,
+  MISSING_METAMASK_MESSAGE,
+  WRONG_NETWORK_MESSAGE,
+} from './errors';
 
 describe('mapContractError', () => {
   it('traduit un require du contrat', () => {
@@ -36,6 +40,12 @@ describe('mapContractError', () => {
   it('traduit l’absence de MetaMask', () => {
     expect(mapContractError({ code: 'MISSING_METAMASK' })).toBe(
       MISSING_METAMASK_MESSAGE,
+    );
+  });
+
+  it('traduit un portefeuille sur le mauvais réseau', () => {
+    expect(mapContractError({ code: 'WRONG_NETWORK' })).toBe(
+      WRONG_NETWORK_MESSAGE,
     );
   });
 

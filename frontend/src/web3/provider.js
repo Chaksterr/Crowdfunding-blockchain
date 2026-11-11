@@ -36,13 +36,26 @@ function missingMetaMaskError() {
   return error;
 }
 
+function wrongNetworkError(chainId) {
+  const error = new Error(
+    `Le portefeuille est sur la chaîne ${chainId} au lieu de ${CHAIN_ID}.`,
+  );
+  error.code = 'WRONG_NETWORK';
+  return error;
+}
+
 /**
  * Signataire MetaMask, pour les transactions. Échoue proprement si aucun
- * portefeuille n'est disponible.
+ * portefeuille n'est disponible, ou s'il n'est pas sur la chaîne locale :
+ * la transaction partirait sinon vers un autre réseau (voter, retirer,
+ * rembourser…), où elle échouerait ou ne ferait rien.
  */
 export async function getSigner() {
   const provider = getBrowserProvider();
   if (!provider) throw missingMetaMaskError();
+
+  const chainId = await getWalletChainId();
+  if (chainId !== CHAIN_ID) throw wrongNetworkError(chainId);
 
   return provider.getSigner();
 }

@@ -4,6 +4,9 @@ const DEFAULT_MESSAGE =
 const MISSING_METAMASK_MESSAGE =
   "MetaMask n'est pas installé. Le mode lecture seule reste disponible.";
 
+const WRONG_NETWORK_MESSAGE =
+  'Mauvais réseau : passez sur Hardhat Local (31337) pour signer cette transaction.';
+
 /** Chaînes require() des contrats, dans l'ordre de priorité. */
 const CONTRACT_MESSAGES = [
   ['Createur uniquement', 'Seul le créateur peut effectuer cette action.'],
@@ -64,6 +67,10 @@ export function mapContractError(error) {
     return 'Transaction annulée dans MetaMask.';
   }
 
+  if (code === 'WRONG_NETWORK') {
+    return WRONG_NETWORK_MESSAGE;
+  }
+
   if (code === 'MISSING_METAMASK' || /MetaMask n'est pas installé/i.test(raw)) {
     return MISSING_METAMASK_MESSAGE;
   }
@@ -94,4 +101,4 @@ export function mapContractError(error) {
   return DEFAULT_MESSAGE;
 }
 
-export { MISSING_METAMASK_MESSAGE };
+export { MISSING_METAMASK_MESSAGE, WRONG_NETWORK_MESSAGE };
