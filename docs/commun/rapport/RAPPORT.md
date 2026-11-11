@@ -178,15 +178,20 @@ La suite utilise Mocha, Chai et Hardhat. Les tests sont isolés par `loadFixture
 | Vote et retrait | 12 | non-donateur, double vote, quorum 1/3 et 2/3, second retrait, cumul |
 | Remboursement | 7 | montant exact, événement, double remboursement, non-donateur, campagne réussie |
 | Sécurité | 3 | réentrance sur `refund`, virement refusé, retrait annulé |
-| **Total** | **47** | **42 `Project` + 5 `Crowdfunding`** |
+| Fabrique (`Crowdfunding.js`) | 12 | créateur = appelant, ordre des campagnes, événement complet, refus propagés, module Ignition |
+| Valeurs limites et invariants (`ProjectBoundaries.js`) | 24 | don au minimum exact, don pile à la date limite, objectif à 1 wei près, seuil de 50 % avec 2 et 4 donateurs, soldes après retrait et remboursement |
+| Cycle de vie complet (`Lifecycle.js`) | 4 | campagne réussie de bout en bout, campagne échouée, deux campagnes isolées, vote d'un donateur d'une autre campagne |
+| **Total** | **82** | **42 `Project` + 12 `Crowdfunding` + 24 valeurs limites + 4 cycle de vie** |
 
-Résultat mesuré le 2026-11-10 :
+Résultat mesuré le 2026-11-11 :
 
 ```text
-47 passing (869ms)
+82 passing (1s)
 ```
 
 ### 5.2 Couverture
+
+Mesurée le 2026-11-11 avec les 82 tests (`npm run coverage`) :
 
 ```text
 contracts/Crowdfunding.sol   100 % statements · 100 % branches · 100 % functions · 100 % lines
@@ -216,7 +221,7 @@ Scripts associés :
 | `npm run seed` | crée trois campagnes de démonstration |
 | `SECONDS=120 npm run ff` | avance l'horloge locale |
 
-La CI GitHub Actions exécute l'installation, la compilation, les 47 tests, la couverture, un déploiement Ignition à blanc et le build du frontend. Le hook `pre-commit` exécute les mêmes vérifications avant chaque commit.
+La CI GitHub Actions lance trois jobs à chaque push : **contrats** (compilation, 82 tests, couverture, déploiement Ignition à blanc), **frontend** (198 tests et build) et **bout en bout** (scénarios A à F dans Chromium, voir le chapitre 7). Le hook `pre-commit` exécute avant chaque commit la compilation, les tests des contrats et du frontend et le build ; les tests de bout en bout, plus longs, restent dans la CI.
 
 ### 5.4 Données de démonstration
 
@@ -326,32 +331,57 @@ Les 20 messages `require` du contrat sont traduits en français dans `web3/error
 Le frontend utilise **Vitest**, **Testing Library** et **jsdom** :
 
 ```text
-6 fichiers, 55 tests
-errors 8 · format 23 · projects 13 · ProjectCard 3 · HomePage 3 · ProjectPage 5
+16 fichiers, 198 tests
+format 60 · errors 41 · walletSlice 23 · projects 13 · campaignTheme 9 · ProjectPage 8
+useAsyncData 7 · ProgressBar 6 · CopyAddress 5 · Countdown 5 · useTransaction 5
+DonationPresets 4 · ErrorBoundary 3 · HomePage 3 · ProjectCard 3 · provider 3
 ```
 
-Les tests couvrent le formatage, le mapping d'erreurs, la couche de données (avec contrats mockés) et la visibilité des actions selon le statut, le rôle et la contribution. Le build de production passe (228 modules) et la CI exécute `npm test` puis `npm run build` lorsque `frontend/package.json` existe.
+Les tests couvrent le formatage, le mapping d'erreurs, la couche de données (avec contrats mockés), le store du portefeuille, les hooks, les composants et la visibilité des actions selon le statut, le rôle et la contribution. Ils vérifient aussi les trois corrections décrites au chapitre 7 : refus de signer sur un mauvais réseau, formulaire réaffiché après un changement de compte, compte à rebours calé sur l'horloge de la chaîne. Le build de production passe (238 modules) et la CI exécute `npm test` puis `npm run build`.
 
 ---
 
 ## 7. Recette et validation
 
-La fiche détaillée est dans `docs/commun/RECETTE.md`. Les scénarios A à F sont rejouables avec les comptes Hardhat #0 à #3.
+La fiche détaillée est dans `docs/commun/RECETTE.md`. Les scénarios A à F sont validés à trois niveaux : les tests des contrats (les règles), les tests du frontend (l'affichage, avec des contrats simulés) et des tests de bout en bout qui rejouent chaque scénario dans un vrai navigateur.
 
-| Scénario | Vérification | Résultat |
+### 7.1 Tests de bout en bout (Playwright)
+
+`npm run e2e` lance une blockchain Hardhat neuve, déploie la fabrique, compile l'application pour la production et pilote Chromium avec **Playwright**. Un portefeuille de test, injecté à la place de MetaMask (interface EIP-1193), répond aux demandes de compte et de réseau et fait signer les transactions par le nœud Hardhat, sans clé privée dans le code. Le scénario A se joue comme en démo : un seul navigateur, avec un changement de compte entre chaque étape.
+
+| Scénario | Vérification automatique | Résultat |
 | --- | --- | --- |
-| A — succès, vote, retrait | 3 dons de 2 ETH, demande de 4 ETH, 2 votes sur 3, retrait | Validé par `npm run simulate` et les tests de contrat ; parcours UI couvert par les tests de `ProjectPage` |
-| B — échec, remboursement | objectif 50 ETH, dons 1 + 2 ETH, deux remboursements | Validé par `npm run simulate` ; contrat vidé, double remboursement refusé |
-| C — don invalide | sous le minimum, après la date limite | Refusé par `contribute()` avec messages traduits |
-| D — quorum insuffisant | 1 vote sur 3 | Refusé par `withdrawRequestedAmount()` |
-| E — doubles actions | double vote, double remboursement, non-créateur | Refusés par les `require` et les mappings |
-| F — sans MetaMask | lecture des campagnes, écriture masquée | Lecture via `JsonRpcProvider`, boutons d'écriture conditionnés par `isConnected` |
+| A — succès, vote, retrait | 3 dons de 2 ETH depuis trois comptes, demande de 4 ETH, 2 votes sur 3, retrait | ✅ le destinataire reçoit exactement 4 ETH |
+| B — échec, remboursement | objectif 50 ETH, dons de 1 et 2 ETH, deux remboursements | ✅ chaque donateur récupère sa mise (moins le gaz), contrat à 0 ETH |
+| C — don invalide | don sous le minimum ; don après la date limite | ✅ refus avant l'envoi ; refus du contrat affiché en français ; formulaire masqué une fois la campagne finie |
+| D — quorum insuffisant | 1 vote sur 3 | ✅ pas de bouton « Retirer », appel direct refusé par le contrat |
+| E — doubles actions | double vote, retrait par un non-créateur, double remboursement | ✅ actions absentes de l'interface et refusées par le contrat |
+| F — sans MetaMask | lecture des campagnes | ✅ lecture complète, aucune action d'écriture |
+| Réseau | portefeuille resté sur une autre chaîne | ✅ aucune transaction envoyée, message clair |
 
-La vérification automatisée repose sur 47 tests de contrat (100 % de couverture) et 55 tests frontend. La recette manuelle dans un navigateur avec MetaMask reste à exécuter sur les quatre postes de l'équipe ; elle est décrite pas à pas dans `RECETTE.md` et ne peut pas être automatisée sans navigateur dans l'environnement de développement utilisé.
+Résultat au 2026-11-11 : **12 tests sur 12 réussis**, en local (environ 30 s) et dans la CI GitHub Actions (job `e2e`, relancé à chaque push).
 
-### 7.1 Limites de la validation
+### 7.2 Défauts corrigés
 
-- Les tests frontend mockent la couche contrats : ils vérifient le comportement de l'interface, pas la signature réelle d'une transaction MetaMask.
+Une relecture de l'interface a relevé trois défauts, que les tests de bout en bout reproduisent. Les tests unitaires d'origine ne pouvaient pas les voir : ils simulent les contrats et ne changent ni de compte, ni de réseau, ni d'horloge.
+
+1. **Changement de compte** : après une action réussie, l'écran « Merci ! » restait affiché pour le compte suivant et cachait Donner, Voter, Retirer et Rembourser jusqu'au rechargement de la page. Le scénario A était bloqué en démo. Correction : les cartes d'action sont recréées à chaque changement de compte (clé React liée au compte).
+2. **Mauvais réseau** : avec MetaMask resté sur une autre chaîne, Voter, Retirer, Rembourser et Créer la demande envoyaient quand même la transaction vers ce réseau. Correction : `getSigner()` vérifie la chaîne avant toute signature, et l'interface affiche « Mauvais réseau : passez sur Hardhat Local (31337) ».
+3. **Horloge** : après `npm run ff`, le compte à rebours suivait l'horloge du navigateur et affichait encore des minutes restantes à côté du badge « Réussie ». Correction : le compte à rebours se cale sur l'heure vue par le contrat (`deadline - timeLeft`).
+
+Chaque correction est couverte par des tests unitaires, qui échouent tous sur le code d'origine, et par les tests de bout en bout des scénarios A et B et du réseau.
+
+### 7.3 Bilan des tests
+
+| Niveau | Outil | Tests |
+| --- | --- | --- |
+| Contrats | Mocha + Chai (Hardhat) | 82, couverture 100 % |
+| Frontend | Vitest + Testing Library | 198 |
+| Bout en bout | Playwright + Chromium | 12 |
+
+### 7.4 Limites de la validation
+
+- Le portefeuille de test remplace l'extension : les fenêtres de confirmation de la vraie extension MetaMask restent à vérifier à la main, avec la fiche `RECETTE.md`.
 - Le multi-PC (`--hostname 0.0.0.0` + `--host`) est documenté mais n'a pas été mesuré dans cet environnement.
 - La vidéo de secours reste à produire par l'équipe. Les captures d'écran sont faites (section 6.4) et se régénèrent avec `npm run e2e:captures`.
 

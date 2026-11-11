@@ -27,7 +27,7 @@ Un portefeuille de test remplace l'extension MetaMask : il répond comme MetaMas
 
 **Résultat au 11/11/2026 : 12 tests sur 12 réussis.** Le job `e2e` de la CI GitHub Actions les relance à chaque push. Les captures d'écran du rapport (ordinateur et téléphone) se régénèrent avec `npm run e2e:captures`, dans `docs/commun/captures/`.
 
-Bugs trouvés par cette recette et corrigés dans `frontend/src/` :
+Bugs relevés à la relecture de l'interface, reproduits par cette recette et corrigés dans `frontend/src/` :
 
 1. Après un changement de compte dans MetaMask, l'écran « Merci ! » du compte précédent restait affiché et cachait Donner, Voter, Retirer ou Rembourser jusqu'au rechargement de la page. Le scénario A était bloqué en démo.
 2. Avec MetaMask sur un autre réseau, Voter, Retirer, Rembourser et Créer la demande envoyaient quand même la transaction, vers ce réseau.
