@@ -15,6 +15,7 @@
     "seed": "hardhat run scripts/seedDemo.js --network localhost",
     "e2e": "hardhat compile --quiet && playwright test -c e2e --grep-invert @captures",
     "e2e:captures": "hardhat compile --quiet && playwright test -c e2e --grep @captures",
+    "report:pdf": "node scripts/exportReport.js",
     "precommit": "bash scripts/precommit.sh",
     "prepare": "git config core.hooksPath .githooks || true"
   },
