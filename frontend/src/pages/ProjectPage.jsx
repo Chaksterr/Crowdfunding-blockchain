@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { isAddress } from 'ethers';
 
@@ -697,6 +697,24 @@ export default function ProjectPage() {
     status !== 'error',
   );
 
+  // Le compte à rebours suit l'horloge de la blockchain, pas celle du
+  // navigateur : sur le réseau local, `npm run ff` avance le temps de la
+  // chaîne. Au chargement, deadline - timeLeft donne l'heure vue par le
+  // contrat ; si elle est en avance sur le navigateur, on avance la date
+  // limite affichée d'autant. Une campagne terminée affiche « Terminée ».
+  const countdownDeadline = useMemo(() => {
+    if (!project) return null;
+    if (project.status !== 0) return 0;
+
+    const deadlineSeconds = Number(project.deadline);
+    const timeLeft = Number(project.timeLeft);
+    if (!Number.isFinite(timeLeft)) return deadlineSeconds;
+
+    const browserNow = Math.floor(Date.now() / 1000);
+    const chainAhead = Math.max(0, deadlineSeconds - timeLeft - browserNow);
+    return deadlineSeconds - chainAhead;
+  }, [project]);
+
   if (!validAddress) {
     return (
       <EmptyState
@@ -727,6 +745,11 @@ export default function ProjectPage() {
   const isCreator =
     Boolean(wallet.account) &&
     wallet.account.toLowerCase() === project.creator.toLowerCase();
+  // Clé liée au compte : quand l'utilisateur change de compte dans MetaMask,
+  // les cartes d'action repartent de zéro. Sans elle, l'écran « Merci ! » du
+  // compte précédent resterait affiché et cacherait Donner, Voter, Retirer
+  // ou Rembourser au nouveau compte jusqu'au rechargement de la page.
+  const accountKey = wallet.account?.toLowerCase() ?? 'visiteur';
   const tone =
     project.status === 2 ? 'success' : project.status === 1 ? 'failed' : 'primary';
 
@@ -795,7 +818,7 @@ export default function ProjectPage() {
               </span>
               <span>Date limite : {formatDeadline(project.deadline)}</span>
               <span>
-                <Countdown deadline={project.deadline} />
+                <Countdown deadline={countdownDeadline} />
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-600 shadow-sm">
@@ -848,7 +871,7 @@ export default function ProjectPage() {
                 label="Temps restant"
                 value={
                   project.status === 0 ? (
-                    <Countdown deadline={project.deadline} />
+                    <Countdown deadline={countdownDeadline} />
                   ) : (
                     'Terminée'
                   )
@@ -880,7 +903,7 @@ export default function ProjectPage() {
               <div className="mt-4 space-y-3">
                 {project.withdrawRequests.map((request) => (
                   <RequestCard
-                    key={request.id}
+                    key={`${request.id}-${accountKey}`}
                     request={request}
                     project={project}
                     isCreator={isCreator}
@@ -892,7 +915,11 @@ export default function ProjectPage() {
 
             {isCreator && project.status === 2 ? (
               <div className="mt-6">
-                <CreateRequestForm project={project} onDone={reload} />
+                <CreateRequestForm
+                  key={accountKey}
+                  project={project}
+                  onDone={reload}
+                />
               </div>
             ) : null}
           </Card>
@@ -954,9 +981,9 @@ export default function ProjectPage() {
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:h-fit">
-          <DonateCard project={project} onDone={reload} />
+          <DonateCard key={accountKey} project={project} onDone={reload} />
           {project.status === 1 && (project.contributions ?? 0n) > 0n ? (
-            <RefundCard project={project} onDone={reload} />
+            <RefundCard key={accountKey} project={project} onDone={reload} />
           ) : null}
         </aside>
       </div>

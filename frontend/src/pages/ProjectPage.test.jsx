@@ -1,10 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { parseEther } from 'ethers';
 import { ToastProvider } from '../components/ToastProvider';
 import ProjectPage from './ProjectPage';
-import { loadProject } from '../web3/projects';
+import { donate, loadProject } from '../web3/projects';
 import { useWallet } from '../hooks/useWallet';
 
 vi.mock('../web3/projects', () => ({
@@ -23,6 +24,7 @@ vi.mock('../web3/provider', () => ({ getSigner: vi.fn() }));
 const PROJECT_ADDRESS = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
 const CREATOR = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 const DONOR = '0x70997970C51812dc3A010C7d01b50e0d17dc79C8';
+const OTHER_DONOR = '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC';
 
 const deadline = BigInt(Math.floor(Date.now() / 1000) + 3600);
 
@@ -47,16 +49,20 @@ function makeProject(overrides = {}) {
   };
 }
 
-function renderPage() {
-  return render(
+function pageTree() {
+  return (
     <ToastProvider>
       <MemoryRouter initialEntries={[`/project/${PROJECT_ADDRESS}`]}>
         <Routes>
           <Route path="/project/:address" element={<ProjectPage />} />
         </Routes>
       </MemoryRouter>
-    </ToastProvider>,
+    </ToastProvider>
   );
+}
+
+function renderPage() {
+  return render(pageTree());
 }
 
 function mockWallet(overrides = {}) {
@@ -157,5 +163,58 @@ describe('ProjectPage', () => {
     expect(await screen.findByText('Atelier vélo')).toBeInTheDocument();
     expect(screen.queryByText(/L'objectif n'a pas été atteint/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Rembourser/i })).not.toBeInTheDocument();
+  });
+
+  it('réaffiche le formulaire de don quand on change de compte après un don', async () => {
+    const user = userEvent.setup();
+    mockWallet({ account: DONOR, status: 'connected', isConnected: true });
+    loadProject.mockResolvedValue(makeProject());
+    donate.mockResolvedValue({ status: 1 });
+
+    const { rerender } = renderPage();
+    const amount = await screen.findByLabelText(/Montant du don/i);
+    await user.clear(amount);
+    await user.type(amount, '1');
+    await user.click(screen.getByRole('button', { name: /^Donner/ }));
+    expect(
+      await screen.findByText(/Merci ! Votre don de 1 ETH est confirmé/),
+    ).toBeInTheDocument();
+
+    // Démo : on passe au donateur suivant dans MetaMask, sans recharger.
+    mockWallet({ account: OTHER_DONOR, status: 'connected', isConnected: true });
+    rerender(pageTree());
+
+    expect(await screen.findByLabelText(/Montant du don/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Merci ! Votre don/)).not.toBeInTheDocument();
+  });
+
+  it('aligne le compte à rebours sur l’horloge de la blockchain', async () => {
+    mockWallet();
+    const now = Math.floor(Date.now() / 1000);
+    // `npm run ff` a avancé la chaîne de 10 min : le contrat voit 5 min
+    // restantes alors que l'horloge du navigateur en voit 15.
+    loadProject.mockResolvedValue(
+      makeProject({ deadline: BigInt(now + 930), timeLeft: 330n }),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Atelier vélo')).toBeInTheDocument();
+    expect(screen.getAllByText('5 min restantes').length).toBeGreaterThan(0);
+    expect(screen.queryByText('15 min restantes')).not.toBeInTheDocument();
+  });
+
+  it('affiche « Terminée » pour une campagne finie, même si le navigateur est en retard', async () => {
+    mockWallet();
+    const now = Math.floor(Date.now() / 1000);
+    loadProject.mockResolvedValue(
+      makeProject({ status: 2, deadline: BigInt(now + 600), timeLeft: 0n }),
+    );
+
+    renderPage();
+
+    expect(await screen.findByText('Atelier vélo')).toBeInTheDocument();
+    expect(screen.queryByText(/restantes/)).not.toBeInTheDocument();
+    expect(screen.getAllByText('Terminée').length).toBeGreaterThanOrEqual(2);
   });
 });
