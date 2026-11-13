@@ -24,7 +24,7 @@
 
 <br><br>
 
-**[🎬 Démo vidéo](#2-démonstration)** · **[⚙️ Installation](#6-installation)** · **[📄 Rapport](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
+**[🎬 Démo vidéo](#2-démonstration)** · **[🖼️ Présentation](https://canva.link/udw0ogomc6fex0b)** · **[⚙️ Installation](#6-installation)** · **[📄 Rapport](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
 
 **🌐 Langue / Language :** Français · [English](README.en.md)
 
@@ -63,6 +63,8 @@ Sur une plateforme de financement participatif classique, l'argent des donateurs
 ---
 
 ## 2. Démonstration
+
+> 🖼️ **Découvrir le projet simplement :** la [présentation du projet](https://canva.link/udw0ogomc6fex0b) résume le problème, la solution, l'architecture et les résultats en quelques slides.
 
 <div align="center">
 

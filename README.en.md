@@ -24,7 +24,7 @@
 
 <br><br>
 
-**[🎬 Demo video](#2-demo)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
+**[🎬 Demo video](#2-demo)** · **[🖼️ Slides](https://canva.link/udw0ogomc6fex0b)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
 
 **🌐 Language / Langue:** [Français](README.md) · English
 
@@ -63,6 +63,8 @@ On a classic crowdfunding platform, donors hand their money to an intermediary. 
 ---
 
 ## 2. Demo
+
+> 🖼️ **Quick overview:** the [project slides](https://canva.link/udw0ogomc6fex0b) (in French) sum up the problem, the solution, the architecture and the results.
 
 <div align="center">
 
