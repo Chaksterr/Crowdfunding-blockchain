@@ -60,8 +60,11 @@ npm run node
 
 - **Ce qui se passe :** Hardhat démarre une blockchain Ethereum locale complète à l'adresse :
   - **RPC URL :** `http://127.0.0.1:8545`
-  - **Chain ID :** `31337`
+  - **Chain ID :** `31338`
 - Hardhat génère automatiquement **20 comptes de test** pré-financés avec **10 000 ETH virtuels chacun**, ainsi que leurs adresses et clés privées correspondantes.
+
+> **Pourquoi `31338` et pas `31337` ?** Hardhat utilise `31337` par défaut, mais MetaMask a déjà enregistré cet ID pour « GoChain Testnet » (symbole GO),
+> ce qui déclenche l'avertissement « Unexpected Native Token Symbol ». Si cet avertissement apparaît avec `31338`, c'est que l'ID de chaîne saisi est erroné.
 
 > [!IMPORTANT]
 > **Laissez ce terminal ouvert.** Si vous le fermez, la blockchain locale s'arrête.
@@ -85,7 +88,7 @@ npm run deploy
     Executed CrowdfundingModule#Crowdfunding
   [ CrowdfundingModule ] successfully deployed 
   ```
-- L'adresse déployée est enregistrée dans `ignition/deployments/chain-31337/deployed_addresses.json`.
+- L'adresse déployée est enregistrée dans `ignition/deployments/chain-31338/deployed_addresses.json`.
 
 *(Si vous redémarrez le nœud local à zéro plus tard, utilisez `npm run deploy:reset`).*
 
@@ -151,7 +154,7 @@ Pour que vos amis ou vous-même puissiez tester l'interface avec MetaMask, voici
 |---|---|
 | **Nom du réseau** | `Hardhat Localhost` |
 | **Nouvelle URL de RPC** | `http://127.0.0.1:8545` |
-| **ID de chaîne** | `31337` |
+| **ID de chaîne** | `31338` |
 | **Symbole de la devise** | `ETH` |
 | **URL de l'explorateur de blocs** | *(laisser vide)* |
 
@@ -164,7 +167,7 @@ Pour que vos amis ou vous-même puissiez tester l'interface avec MetaMask, voici
 Lorsque vous lancez `npm run node`, Hardhat affiche 20 comptes avec leurs clés privées.
 Voici les 3 premiers comptes standard générés par Hardhat :
 
-> ⚠️ **Clés de test publiques.** Ces clés sont identiques pour tous les utilisateurs de Hardhat dans le monde et sont publiées dans sa documentation. Elles ne servent **que** sur le réseau local 31337. N'envoyez **jamais** de vrais fonds à ces adresses : des robots les vident en quelques secondes sur les vrais réseaux. Ne mettez jamais dans ce dépôt une clé privée qui ne fait pas partie de cette liste.
+> ⚠️ **Clés de test publiques.** Ces clés sont identiques pour tous les utilisateurs de Hardhat dans le monde et sont publiées dans sa documentation. Elles ne servent **que** sur le réseau local 31338. N'envoyez **jamais** de vrais fonds à ces adresses : des robots les vident en quelques secondes sur les vrais réseaux. Ne mettez jamais dans ce dépôt une clé privée qui ne fait pas partie de cette liste.
 
 #### Compte #0 (Utile comme Créateur de Projet) :
 - **Adresse :** `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`
@@ -223,12 +226,12 @@ const provider = new ethers.BrowserProvider(window.ethereum);
 const signer = await provider.getSigner();
 const userAddress = await signer.getAddress();
 
-// 3. Vérifier le bon réseau (Chain ID 31337 = 0x7a69 en hexadécimal)
+// 3. Vérifier le bon réseau (Chain ID 31338 = 0x7a6a en hexadécimal)
 const network = await provider.getNetwork();
-if (network.chainId !== 31337n) {
+if (network.chainId !== 31338n) {
   await window.ethereum.request({
     method: "wallet_switchEthereumChain",
-    params: [{ chainId: "0x7a69" }], // 31337 en hexadécimal
+    params: [{ chainId: "0x7a6a" }], // 31338 en hexadécimal
   });
 }
 ```
@@ -394,7 +397,7 @@ Avant de coder le frontend, assurez-vous d'avoir :
 - [x] Démarré le nœud local : `npm run node` (Terminal 1).
 - [x] Déployé la fabrique : `npm run deploy` (Terminal 2).
 - [x] Synchronisé les ABI : `npm run sync`.
-- [x] Ajouté le réseau Hardhat (RPC `http://127.0.0.1:8545`, Chain ID `31337`) dans MetaMask.
+- [x] Ajouté le réseau Hardhat (RPC `http://127.0.0.1:8545`, Chain ID `31338`) dans MetaMask.
 - [x] Importé au moins 2 comptes de test dans MetaMask via leurs clés privées.
 - [x] Noté la manipulation "Effacer les données de l'onglet activité" en cas d'erreur de nonce.
 

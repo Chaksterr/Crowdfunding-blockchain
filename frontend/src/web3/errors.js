@@ -5,7 +5,12 @@ const MISSING_METAMASK_MESSAGE =
   "MetaMask n'est pas installé. Le mode lecture seule reste disponible.";
 
 const WRONG_NETWORK_MESSAGE =
-  'Mauvais réseau : passez sur Hardhat Local (31337) pour signer cette transaction.';
+  'Mauvais réseau : passez sur Hardhat Local (31338) pour signer cette transaction.';
+
+/** Deux réseaux enregistrés partagent le même chainId : la signature partirait
+ * vers un autre nœud que celui que le site interroge. */
+const NETWORK_MISMATCH_MESSAGE =
+  "Le portefeuille signe sur un autre réseau que le site (même identifiant de chaîne, nœud différent). Dans MetaMask, supprimez l'ancien réseau et gardez celui qui pointe vers http://127.0.0.1:8545, puis rechargez la page.";
 
 const INSUFFICIENT_FUNDS_MESSAGE =
   'Solde insuffisant pour payer les frais de transaction.';
@@ -86,6 +91,10 @@ export function mapContractError(error) {
     return WRONG_NETWORK_MESSAGE;
   }
 
+  if (code === 'NETWORK_MISMATCH') {
+    return NETWORK_MISMATCH_MESSAGE;
+  }
+
   if (code === 'MISSING_METAMASK' || /MetaMask n'est pas installé/i.test(raw)) {
     return MISSING_METAMASK_MESSAGE;
   }
@@ -152,6 +161,7 @@ export {
   DISCONNECTED_MESSAGE,
   INSUFFICIENT_FUNDS_MESSAGE,
   MISSING_METAMASK_MESSAGE,
+  NETWORK_MISMATCH_MESSAGE,
   NONCE_MESSAGE,
   UNAUTHORIZED_MESSAGE,
   WRONG_NETWORK_MESSAGE,

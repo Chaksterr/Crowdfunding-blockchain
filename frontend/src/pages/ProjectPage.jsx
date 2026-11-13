@@ -190,7 +190,7 @@ function DonateCard({ project, onDone }) {
           Réseau incorrect
         </h2>
         <p className="mt-2 text-sm text-slate-600">
-          Passez sur Hardhat Local (31337) pour signer une transaction.
+          Passez sur Hardhat Local (31338) pour signer une transaction.
         </p>
         <Button className="mt-4" fullWidth onClick={switchNetwork}>
           Changer de réseau
@@ -669,6 +669,44 @@ function RefundCard({ project, onDone }) {
   );
 }
 
+/**
+ * Texte de la section « Demandes de retrait » quand aucune demande n'existe.
+ * Le contrat ne passe en « Réussie » qu'après la date limite, même si
+ * l'objectif est déjà dépassé : le message doit le dire, sinon un créateur
+ * qui a collecté 7 ETH pour un objectif de 5 croit que le bouton manque.
+ */
+function withdrawalEmptyCopy(project) {
+  if (project.status === 2) {
+    return {
+      title: "Le créateur n'a pas encore créé de demande.",
+      description:
+        'Dès qu’une demande est créée, les donateurs peuvent voter pour l’approuver.',
+    };
+  }
+
+  if (project.status === 1) {
+    return {
+      title: "Campagne échouée : aucun retrait n'est possible.",
+      description:
+        'Les fonds restent sur le contrat et chaque donateur peut les récupérer.',
+    };
+  }
+
+  if (project.totalRaised >= project.goal) {
+    return {
+      title: 'Objectif atteint : la demande de retrait s’ouvrira à la date limite.',
+      description:
+        'Le contrat ne passe en « Réussie » qu’une fois la date limite atteinte, même si l’objectif est déjà dépassé.',
+    };
+  }
+
+  return {
+    title: 'Les demandes de retrait seront disponibles si la campagne réussit.',
+    description:
+      'Il faut atteindre l’objectif avant la date limite pour que les fonds soient retirables.',
+  };
+}
+
 export default function ProjectPage() {
   const { address } = useParams();
   const wallet = useWallet();
@@ -893,11 +931,8 @@ export default function ProjectPage() {
             {project.withdrawRequests.length === 0 ? (
               <EmptyState
                 className="mt-4"
-                title={
-                  project.status === 2
-                    ? "Le créateur n'a pas encore créé de demande."
-                    : 'Les demandes de retrait seront disponibles si la campagne réussit.'
-                }
+                title={withdrawalEmptyCopy(project).title}
+                description={withdrawalEmptyCopy(project).description}
               />
             ) : (
               <div className="mt-4 space-y-3">

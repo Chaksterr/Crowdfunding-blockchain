@@ -36,7 +36,7 @@ npm run node
 ```
 
 - RPC : `http://127.0.0.1:8545`
-- Chain ID : `31337`
+- Chain ID : `31338`
 - 20 comptes de test pré-financés à 10 000 ETH, avec leurs clés privées affichées.
 
 **Laissez ce terminal ouvert** pendant toute la session. Sa fermeture arrête la blockchain et efface son état.
@@ -56,7 +56,7 @@ Adresse attendue de la fabrique sur un nœud neuf :
 0x5FbDB2315678afecb367f032d93F642f64180aa3
 ```
 
-Elle est aussi écrite dans `ignition/deployments/chain-31337/deployed_addresses.json` puis recopiée dans `frontend/src/deployed.json`.
+Elle est aussi écrite dans `ignition/deployments/chain-31338/deployed_addresses.json` puis recopiée dans `frontend/src/deployed.json`.
 
 ---
 
@@ -115,14 +115,14 @@ VITE_FACTORY_ADDRESS=0x5FbDB2315678afecb367f032d93F642f64180aa3
 1. **Réglages → Réseaux → Ajouter un réseau manuellement**
    - Nom : `Hardhat Local`
    - URL RPC : `http://127.0.0.1:8545`
-   - ID de chaîne : `31337`
+   - ID de chaîne : `31338`
    - Symbole : `ETH`
 2. **Importer les comptes de test** (Créateur, Donateurs 1/2/3) avec les clés privées affichées dans le terminal 1. Chacun reçoit 10 000 ETH.
 3. **Après chaque redémarrage de `npm run node`** : MetaMask → **Paramètres → Avancé → Effacer les données d'activité**. Sinon les transactions restent bloquées avec l'erreur « nonce too high ».
 
 Détails et clés des premiers comptes : [GUIDE_METAMASK_HARDHAT.md](GUIDE_METAMASK_HARDHAT.md), sections 2.1 à 2.3.
 
-> ⚠️ Ces clés sont **publiques** et réservées au réseau local 31337. N'utilisez jamais un vrai portefeuille pour ce projet.
+> ⚠️ Ces clés sont **publiques** et réservées au réseau local 31338. N'utilisez jamais un vrai portefeuille pour ce projet.
 
 ---
 
@@ -144,7 +144,7 @@ cd frontend
 npm run dev -- --host
 ```
 
-Sur le **second PC**, dans MetaMask, remplacez l'URL RPC `127.0.0.1` par l'**IP locale du PC hôte**, par exemple `http://192.168.1.42:8545` (même ID de chaîne `31337`). Ouvrez ensuite l'application via l'adresse réseau affichée par Vite (ex. `http://192.168.1.42:5173`).
+Sur le **second PC**, dans MetaMask, remplacez l'URL RPC `127.0.0.1` par l'**IP locale du PC hôte**, par exemple `http://192.168.1.42:8545` (même ID de chaîne `31338`). Ouvrez ensuite l'application via l'adresse réseau affichée par Vite (ex. `http://192.168.1.42:5173`).
 
 ---
 
@@ -172,11 +172,11 @@ Puis dans MetaMask : **Effacer les données d'activité** pour chaque compte imp
 | --- | --- | --- |
 | `nonce too high` / transactions bloquées | MetaMask garde l'historique d'un ancien nœud | **Paramètres → Avancé → Effacer les données d'activité** |
 | `HHE22` / « not a local Hardhat network » | La commande n'est pas lancée sur le réseau local | Vérifier `--network localhost` et que `npm run node` tourne |
-| `npm run sync` : « Pas encore de déploiement » | Aucun déploiement Ignition dans `chain-31337` | Lancer `npm run deploy` (ou `npm run deploy:reset`) puis `npm run sync` |
-| Le frontend ne trouve pas le contrat | Mauvaise adresse / mauvais réseau | Vérifier `frontend/src/deployed.json` et que MetaMask est sur la chaîne `31337` |
+| `npm run sync` : « Pas encore de déploiement » | Aucun déploiement Ignition dans `chain-31338` | Lancer `npm run deploy` (ou `npm run deploy:reset`) puis `npm run sync` |
+| Le frontend ne trouve pas le contrat | Mauvaise adresse / mauvais réseau | Vérifier `frontend/src/deployed.json` et que MetaMask est sur la chaîne `31338` |
 | `npm run seed` : « fabrique contient déjà … campagne(s) » | L'état n'est pas vide | `npm run deploy:reset` puis `npm run seed` |
 | `ECONNREFUSED 127.0.0.1:8545` | Le nœud local n'est pas lancé | Démarrer `npm run node` (terminal 1) |
-| Le solde MetaMask ne correspond pas | Compte importé sur un autre réseau | Basculer MetaMask sur `Hardhat Local` (31337) |
+| Le solde MetaMask ne correspond pas | Compte importé sur un autre réseau | Basculer MetaMask sur `Hardhat Local` (31338) |
 
 ---
 

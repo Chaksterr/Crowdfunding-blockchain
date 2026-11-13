@@ -3,7 +3,7 @@
 **Équipe :** Yessine Abdelmaksoud · Mohamed Ali Abid · Ahmad Chakcha · Mohamed Ali Djemal\
 **Date :** novembre 2026\
 **Stack :** Solidity 0.8.24 · Hardhat · Hardhat Ignition · ethers.js v6 · React · Redux Toolkit · Tailwind CSS · MetaMask\
-**Réseau de démonstration :** Hardhat local, chainId `31337`
+**Réseau de démonstration :** Hardhat local, chainId `31338`
 
 ---
 
@@ -78,7 +78,7 @@ flowchart TB
         W3["ethers.js v6 + Redux"]
     end
     MM["MetaMask"]
-    subgraph CHAIN["Hardhat · 31337"]
+    subgraph CHAIN["Hardhat · 31338"]
         F["Crowdfunding.sol<br/>fabrique"]
         P["Project.sol<br/>une instance par campagne"]
     end
@@ -283,7 +283,7 @@ Les montants restent des `bigint` jusqu'à l'affichage : aucun `Number()` n'est 
 
 ### 6.3 Gestion du portefeuille
 
-Le slice Redux contient `{ status, account, chainId, balance, error }`. Au montage, `eth_accounts` est appelé silencieusement : si MetaMask est déjà autorisé, l'adresse est restaurée ; sinon l'application reste en lecture seule. Les événements `accountsChanged` et `chainChanged` mettent à jour l'état, et un bandeau propose de basculer sur la chaîne `31337` en cas de mauvais réseau. Sans MetaMask, le bouton devient « Installer MetaMask » et un message explique la lecture seule.
+Le slice Redux contient `{ status, account, chainId, balance, error }`. Au montage, `eth_accounts` est appelé silencieusement : si MetaMask est déjà autorisé, l'adresse est restaurée ; sinon l'application reste en lecture seule. Les événements `accountsChanged` et `chainChanged` mettent à jour l'état, et un bandeau propose de basculer sur la chaîne `31338` en cas de mauvais réseau. Sans MetaMask, le bouton devient « Installer MetaMask » et un message explique la lecture seule.
 
 ### 6.4 Pages et parcours
 
@@ -373,7 +373,7 @@ Résultat au 2026-11-11 : **12 tests sur 12 réussis**, en local (environ 30 s) 
 Une relecture de l'interface a relevé trois défauts, que les tests de bout en bout reproduisent. Les tests unitaires d'origine ne pouvaient pas les voir : ils simulent les contrats et ne changent ni de compte, ni de réseau, ni d'horloge.
 
 1. **Changement de compte** : après une action réussie, l'écran « Merci ! » restait affiché pour le compte suivant et cachait Donner, Voter, Retirer et Rembourser jusqu'au rechargement de la page. Le scénario A était bloqué en démo. Correction : les cartes d'action sont recréées à chaque changement de compte (clé React liée au compte).
-2. **Mauvais réseau** : avec MetaMask resté sur une autre chaîne, Voter, Retirer, Rembourser et Créer la demande envoyaient quand même la transaction vers ce réseau. Correction : `getSigner()` vérifie la chaîne avant toute signature, et l'interface affiche « Mauvais réseau : passez sur Hardhat Local (31337) ».
+2. **Mauvais réseau** : avec MetaMask resté sur une autre chaîne, Voter, Retirer, Rembourser et Créer la demande envoyaient quand même la transaction vers ce réseau. Correction : `getSigner()` vérifie la chaîne avant toute signature, et l'interface affiche « Mauvais réseau : passez sur Hardhat Local (31338) ».
 3. **Horloge** : après `npm run ff`, le compte à rebours suivait l'horloge du navigateur et affichait encore des minutes restantes à côté du badge « Réussie ». Correction : le compte à rebours se cale sur l'heure vue par le contrat (`deadline - timeLeft`).
 
 Chaque correction est couverte par des tests unitaires, qui échouent tous sur le code d'origine, et par les tests de bout en bout des scénarios A et B et du réseau.

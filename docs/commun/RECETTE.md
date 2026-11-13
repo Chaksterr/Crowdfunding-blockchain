@@ -48,7 +48,7 @@ npm run seed
 cd frontend && npm run dev
 ```
 
-- Réseau MetaMask : `Hardhat Local`, RPC `http://127.0.0.1:8545`, chainId `31337`, symbole `ETH`.
+- Réseau MetaMask : `Hardhat Local`, RPC `http://127.0.0.1:8545`, chainId `31338`, symbole `ETH`.
 - Vérifier que l'adresse de la fabrique affichée est `0x5FbDB2315678afecb367f032d93F642f64180aa3`.
 - Pour accélérer le temps entre deux étapes : `SECONDS=120 npm run ff` (à la racine, nœud actif).
 
@@ -137,7 +137,7 @@ cd frontend && npm run dev -- --host
 
 # PC 2
 # ouvrir http://<IP-du-PC1>:5173
-# MetaMask : ajouter le réseau avec http://<IP-du-PC1>:8545, chainId 31337
+# MetaMask : ajouter le réseau avec http://<IP-du-PC1>:8545, chainId 31338
 ```
 
 Vérifier depuis le PC 2 : lecture des campagnes, connexion MetaMask, un don signé, et la mise à jour de la liste.

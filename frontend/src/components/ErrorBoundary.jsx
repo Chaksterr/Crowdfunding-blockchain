@@ -30,7 +30,7 @@ export default class ErrorBoundary extends Component {
           </h1>
           <p className="mt-2 text-sm leading-relaxed">
             Rechargez la page. Si le problème persiste, vérifiez que le nœud
-            local est lancé et que MetaMask est configuré sur la chaîne 31337.
+            local est lancé et que MetaMask est configuré sur la chaîne 31338.
           </p>
 
           {import.meta.env.DEV && (

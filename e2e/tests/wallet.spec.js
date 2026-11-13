@@ -40,7 +40,7 @@ test.describe('Portefeuille et réseau', () => {
 
     await expect(
       page
-        .getByText('Mauvais réseau : passez sur Hardhat Local (31337) pour signer cette transaction.')
+        .getByText('Mauvais réseau : passez sur Hardhat Local (31338) pour signer cette transaction.')
         .first(),
     ).toBeVisible();
     expect(await attemptsOnWrongChain(page)).toBe(0);

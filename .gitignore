@@ -22,7 +22,7 @@ cache/
 typechain-types/
 coverage/
 coverage.json
-# Déploiements locaux : propres à chaque machine (chaîne 31337)
+# Déploiements locaux : propres à chaque machine (chaîne 31338)
 ignition/deployments/
 
 # ===== Frontend (Vite) =====

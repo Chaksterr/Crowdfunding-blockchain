@@ -11,18 +11,25 @@ const STATUS = ["En cours", "Échouée", "Réussie"]; // 0, 1, 2 (voir Project.s
 const DETERMINISTIC_FACTORY = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 // Cherche l'adresse de la fabrique : env, puis déploiement Ignition, puis adresse déterministe.
+function latestDeploymentFile() {
+  const root = path.join(__dirname, "..", "ignition", "deployments");
+  if (!fs.existsSync(root)) return null;
+
+  const candidates = fs
+    .readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("chain-"))
+    .map((entry) => path.join(root, entry.name, "deployed_addresses.json"))
+    .filter((file) => fs.existsSync(file))
+    .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+
+  return candidates[0] ?? null;
+}
+
 function resolveFactoryAddress() {
   if (process.env.FACTORY_ADDRESS) return process.env.FACTORY_ADDRESS;
 
-  const deployed = path.join(
-    __dirname,
-    "..",
-    "ignition",
-    "deployments",
-    "chain-31337",
-    "deployed_addresses.json"
-  );
-  if (fs.existsSync(deployed)) {
+  const deployed = latestDeploymentFile();
+  if (deployed) {
     const addresses = JSON.parse(fs.readFileSync(deployed, "utf8"));
     const address = addresses["CrowdfundingModule#Crowdfunding"];
     if (address) return address;

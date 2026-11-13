@@ -50,7 +50,7 @@ Ce document explique ce qui a été réalisé dans la Phase 1, comment c'est con
 | `scripts/simulate.js` | Rejoue les scénarios A (succès) et B (échec) sur le node local |
 | `scripts/fastForward.js` | Avance l'horloge de la blockchain locale |
 | `scripts/syncAbi.js` | Copie l'ABI et l'adresse déployée dans `frontend/src/` |
-| `hardhat.config.js` | Solidity 0.8.24, réseau `localhost` (chaîne 31337) |
+| `hardhat.config.js` | Solidity 0.8.24, réseau `localhost` (chaîne 31338) |
 | `.solcover.js` | Exclut les contrats de test du calcul de couverture |
 
 ---
@@ -297,7 +297,7 @@ Les tests utilisent `time.increase()` de Hardhat pour **avancer le temps** et si
 
 ### Déploiement avec Hardhat Ignition
 
-`ignition/modules/Crowdfunding.js` déploie **uniquement la fabrique**. Les campagnes ne sont pas déployées à l'avance : elles sont créées ensuite depuis l'interface, avec `createProject()`. Ignition retient l'adresse déployée dans `ignition/deployments/chain-31337/`, ce qui rend le déploiement reproductible.
+`ignition/modules/Crowdfunding.js` déploie **uniquement la fabrique**. Les campagnes ne sont pas déployées à l'avance : elles sont créées ensuite depuis l'interface, avec `createProject()`. Ignition retient l'adresse déployée dans `ignition/deployments/chain-31338/`, ce qui rend le déploiement reproductible.
 
 Sur un node local neuf, la fabrique est toujours déployée à la même adresse : `0x5FbDB2315678afecb367f032d93F642f64180aa3`.
 

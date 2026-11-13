@@ -40,7 +40,7 @@ function makeStore(wallet) {
   });
 }
 
-function makeBrowserProvider({ accounts = [ACCOUNT], chainId = '0x7a69' } = {}) {
+function makeBrowserProvider({ accounts = [ACCOUNT], chainId = '0x7a6a' } = {}) {
   return {
     send: vi.fn(async (method) => {
       if (method === 'eth_accounts') return accounts;
@@ -99,7 +99,7 @@ describe('walletSlice — reducers', () => {
   });
 
   it('setChain enregistre la chaîne et normalise undefined en null', () => {
-    expect(walletReducer(initial, setChain(31337)).chainId).toBe(31337);
+    expect(walletReducer(initial, setChain(31338)).chainId).toBe(31338);
     expect(walletReducer({ ...initial, chainId: 1 }, setChain(undefined)).chainId).toBeNull();
   });
 
@@ -124,14 +124,14 @@ describe('walletSlice — reducers', () => {
     const state = {
       status: 'connected',
       account: ACCOUNT,
-      chainId: 31337,
+      chainId: 31338,
       balance: '10',
       error: 'x',
     };
     expect(walletReducer(state, disconnected())).toEqual({
       status: 'idle',
       account: null,
-      chainId: 31337,
+      chainId: 31338,
       balance: null,
       error: null,
     });
@@ -161,7 +161,7 @@ describe('hydrateWallet', () => {
     expect(store.getState().wallet).toMatchObject({
       status: 'connected',
       account: ACCOUNT,
-      chainId: 31337,
+      chainId: 31338,
       balance: '5',
     });
   });
@@ -237,11 +237,11 @@ describe('connectWalletThunk', () => {
     expect(store.getState().wallet.status).toBe('connecting');
     await pending;
 
-    expect(mocks.ensureChain).toHaveBeenCalledWith(31337);
+    expect(mocks.ensureChain).toHaveBeenCalledWith(31338);
     expect(store.getState().wallet).toEqual({
       status: 'connected',
       account: ACCOUNT,
-      chainId: 31337,
+      chainId: 31338,
       balance: '5',
       error: null,
     });
@@ -294,7 +294,7 @@ describe('connectWalletThunk', () => {
 
   it('signale qu’aucun compte n’a été autorisé', async () => {
     mocks.hasMetaMask.mockReturnValue(true);
-    mocks.connectWallet.mockResolvedValue({ account: null, chainId: 31337 });
+    mocks.connectWallet.mockResolvedValue({ account: null, chainId: 31338 });
 
     const store = makeStore();
     await store.dispatch(connectWalletThunk());

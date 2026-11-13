@@ -28,7 +28,7 @@ const QUESTIONS = [
     id: 'reseau',
     question: 'Sur quel réseau la campagne est-elle enregistrée ?',
     answer:
-      "Sur le réseau local Hardhat (chaîne 31337). Aucun fonds réel n'est en jeu et aucun explorateur public ne peut afficher ces transactions.",
+      "Sur le réseau local Hardhat (chaîne 31338). Aucun fonds réel n'est en jeu et aucun explorateur public ne peut afficher ces transactions.",
   },
 ];
 

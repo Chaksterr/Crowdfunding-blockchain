@@ -8,7 +8,7 @@
 - [ ] `npm run node` lancé, terminal visible mais propre.
 - [ ] `npm run deploy` puis `npm run sync` puis `npm run seed` exécutés.
 - [ ] `cd frontend && npm run dev` lancé, page d'accueil ouverte.
-- [ ] MetaMask : réseau `Hardhat Local` (31337), comptes Créateur / D1 / D2 / D3 importés.
+- [ ] MetaMask : réseau `Hardhat Local` (31338), comptes Créateur / D1 / D2 / D3 importés.
 - [ ] **Effacer les données d'activité** dans MetaMask si le nœud a redémarré.
 - [ ] Onglets préparés : application, terminal, slides.
 - [ ] Vidéo de secours accessible hors ligne.
@@ -68,7 +68,7 @@ Ouvrir l'application dans un profil sans extension : la lecture fonctionne, les 
 | MetaMask bloqué (« nonce too high ») | Effacer les données d'activité, recharger |
 | Transaction en attente | Attendre 5 s, sinon annuler et rejouer |
 | Nœud planté | Relancer `npm run node`, redéployer, reseeder, recharger |
-| Réseau incorrect | MetaMask → passer sur Hardhat Local (31337) |
+| Réseau incorrect | MetaMask → passer sur Hardhat Local (31338) |
 | Application indisponible | Lancer la vidéo de secours |
 | Question technique | Répondre court, proposer d'y revenir après la démo |
 

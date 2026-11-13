@@ -165,7 +165,7 @@ export default function CreatePage() {
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
             La création d'une campagne est une transaction signée par votre
             compte. MetaMask doit être connecté au réseau Hardhat local
-            (chainId 31337).
+            (chainId 31338).
           </p>
           <Button
             className="mt-5"
@@ -182,7 +182,7 @@ export default function CreatePage() {
             Réseau incorrect
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            Passez sur Hardhat Local (chainId 31337) pour créer une campagne.
+            Passez sur Hardhat Local (chainId 31338) pour créer une campagne.
           </p>
           <Button className="mt-5" onClick={switchNetwork} fullWidth>
             Changer de réseau

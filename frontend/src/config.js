@@ -5,9 +5,14 @@ import deployed from './deployed.json';
 export const RPC_URL =
   (import.meta.env.VITE_RPC_URL || '').trim() || 'http://127.0.0.1:8545';
 
-/** Chaîne Hardhat locale imposée pour les écritures. */
-export const CHAIN_ID = 31337;
-export const CHAIN_ID_HEX = '0x7a69';
+/**
+ * Chaîne Hardhat locale imposée pour les écritures.
+ * 31338 plutôt que le 31337 par défaut : ce dernier appartient déjà à
+ * « GoChain Testnet » dans la liste des chaînes de MetaMask (symbole GO), ce
+ * qui provoque une alerte et des collisions de réseaux dans le portefeuille.
+ */
+export const CHAIN_ID = 31338;
+export const CHAIN_ID_HEX = '0x7a6a';
 export const CHAIN_NAME = 'Hardhat Local';
 
 /**

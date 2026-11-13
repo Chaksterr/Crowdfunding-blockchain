@@ -86,7 +86,7 @@ export async function getWalletChainId() {
 }
 
 /**
- * Force la chaîne Hardhat locale (31337). Bascule si le réseau est déjà connu,
+ * Force la chaîne Hardhat locale (31338). Bascule si le réseau est déjà connu,
  * sinon propose de l'ajouter à MetaMask.
  * @returns {Promise<number>} la chaîne active après l'opération
  */
@@ -129,7 +129,51 @@ export async function ensureChain(chainId = CHAIN_ID) {
     }
   }
 
+  await assertSameChainAsNode(provider);
+
   return chainId;
+}
+
+/**
+ * Un portefeuille peut conserver plusieurs réseaux qui partagent le même
+ * chainId : `eth_chainId` ne dit alors pas lequel est réellement actif, et une
+ * transaction peut partir vers un autre nœud que celui lu par l'application.
+ * On compare donc le dernier bloc du portefeuille à celui du nœud local.
+ */
+async function assertSameChainAsNode(walletProvider) {
+  const mismatch = () => {
+    const error = new Error(
+      "Le portefeuille signe sur un autre réseau que celui de l'application : même identifiant de chaîne, mais un nœud différent. Dans MetaMask, supprimez l'ancien réseau et gardez celui qui pointe vers " +
+        RPC_URL +
+        '.',
+    );
+    error.code = 'NETWORK_MISMATCH';
+    return error;
+  };
+
+  try {
+    const walletHead = await walletProvider.send('eth_getBlockByNumber', [
+      'latest',
+      false,
+    ]);
+    if (!walletHead) return;
+
+    // Même hauteur des deux côtés : comparaison sans course avec le minage.
+    const sameHeight = await readProvider
+      .getBlock(walletHead.number)
+      .catch(() => null);
+    if (sameHeight) {
+      if (sameHeight.hash !== walletHead.hash) throw mismatch();
+      return;
+    }
+
+    // Le portefeuille est à une hauteur inconnue du nœud : autre chaîne.
+    const nodeHead = await readProvider.getBlock('latest').catch(() => null);
+    if (nodeHead && nodeHead.hash !== walletHead.hash) throw mismatch();
+  } catch (error) {
+    if (error?.code === 'NETWORK_MISMATCH') throw error;
+    // Nœud local injoignable : l'erreur de lecture réelle remontera plus loin.
+  }
 }
 
 /**

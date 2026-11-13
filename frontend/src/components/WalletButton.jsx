@@ -214,7 +214,7 @@ export default function WalletButton() {
           {isWrongNetwork && (
             <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-2.5">
               <p className="text-xs font-medium text-amber-900">
-                Mauvais réseau. Passez sur Hardhat Local (31337).
+                Mauvais réseau. Passez sur Hardhat Local (31338).
               </p>
               <button
                 type="button"

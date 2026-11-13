@@ -40,7 +40,7 @@ jobs:
         run: npx hardhat coverage
 
       - name: Deployment smoke test (in-process Hardhat network)
-        run: npx hardhat ignition deploy ignition/modules/Crowdfunding.js --network hardhat
+        run: HARDHAT_IGNITION_CONFIRM_DEPLOYMENT=1 npx hardhat ignition deploy ignition/modules/Crowdfunding.js --network hardhat
 
       - name: Sync ABI and address into the frontend
         run: npm run sync

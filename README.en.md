@@ -53,7 +53,7 @@ flowchart TB
     MM["MetaMask<br/>signs transactions"]
 
     subgraph CHAIN["Local Hardhat blockchain"]
-        RPC["JSON-RPC node<br/>127.0.0.1:8545<br/>chainId 31337"]
+        RPC["JSON-RPC node<br/>127.0.0.1:8545<br/>chainId 31338"]
         F["Crowdfunding.sol<br/>factory"]
         P["Project.sol<br/>one contract per campaign"]
     end
@@ -192,7 +192,7 @@ plateforme-crowdfunding-blockchain/
 │       └── phase1.md                  # smart contracts explained in detail
 ├── .github/workflows/ci.yml           # continuous integration (GitHub Actions)
 ├── .githooks/pre-commit               # runs scripts/precommit.sh
-├── hardhat.config.js                  # Solidity 0.8.24, localhost network (31337)
+├── hardhat.config.js                  # Solidity 0.8.24, localhost network (31338)
 ├── .solcover.js                       # coverage configuration
 ├── package.json                       # project npm scripts
 ├── README.md
@@ -262,7 +262,7 @@ The state is never stored: `getStatus()` recomputes it on every read from the cu
 - **Campaign details**: donation with suggested amounts, donor list, withdrawal requests with a vote bar. The available actions (donate, request a withdrawal, vote, withdraw, get a refund) depend on the campaign's state and the connected account's role.
 - **My contributions**: the campaigns supported by the connected account and the total given.
 - **Without MetaMask**: campaigns can still be viewed in read-only mode.
-- **Right network**: detects a wrong network and offers a button to switch to Hardhat Local (31337).
+- **Right network**: detects a wrong network and offers a button to switch to Hardhat Local (31338).
 - **Clear feedback**: a transaction preview before signing, success or failure notifications, and contract errors translated into plain French.
 - **Responsive**: works on phones and computers.
 
@@ -328,7 +328,7 @@ npm run dev     # http://localhost:5173
 1. Add the network: **Settings → Networks → Add a network manually**
    - Name: `Hardhat Local`
    - RPC URL: `http://127.0.0.1:8545`
-   - Chain ID: `31337`
+   - Chain ID: `31338`
    - Symbol: `ETH`
 2. Import a few test accounts using the private keys printed in terminal 1. `npm run seed` uses account #0 as the creator and accounts #1 to #3 as donors.
 3. Open <http://localhost:5173> and click **Connecter MetaMask** (Connect MetaMask).

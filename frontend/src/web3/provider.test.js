@@ -44,7 +44,7 @@ describe('revokeWalletPermission', () => {
   });
 
   it('reste silencieux si le portefeuille ne sait pas révoquer', async () => {
-    installWallet('0x7a69');
+    installWallet('0x7a6a');
     const { revokeWalletPermission } = await loadProvider();
 
     await expect(revokeWalletPermission()).resolves.toBe(false);
@@ -72,8 +72,8 @@ describe('getSigner', () => {
     );
   });
 
-  it('renvoie le signataire du compte connecté sur Hardhat Local (31337)', async () => {
-    installWallet('0x7a69');
+  it('renvoie le signataire du compte connecté sur Hardhat Local (31338)', async () => {
+    installWallet('0x7a6a');
     const { getSigner } = await loadProvider();
 
     const signer = await getSigner();

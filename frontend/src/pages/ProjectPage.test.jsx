@@ -68,7 +68,7 @@ function renderPage() {
 function mockWallet(overrides = {}) {
   useWallet.mockReturnValue({
     account: null,
-    chainId: 31337,
+    chainId: 31338,
     balance: '0',
     status: 'disconnected',
     isConnected: false,
