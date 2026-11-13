@@ -133,6 +133,27 @@ export async function ensureChain(chainId = CHAIN_ID) {
 }
 
 /**
+ * Révoque l'autorisation du site auprès du portefeuille (EIP-2255).
+ * Sans cette révocation, `eth_accounts` rend le compte au chargement suivant :
+ * la déconnexion ne tient pas et le site continue d'envoyer pour ce compte.
+ * @returns {Promise<boolean>} true si le portefeuille a bien révoqué l'accès
+ */
+export async function revokeWalletPermission() {
+  const provider = getBrowserProvider();
+  if (!provider) return false;
+
+  try {
+    await provider.send('wallet_revokePermissions', [{ eth_accounts: {} }]);
+    // Le fournisseur en cache garderait l'ancien compte : on le recrée.
+    browserProvider = null;
+    return true;
+  } catch {
+    // Portefeuille sans cette méthode : la déconnexion reste locale.
+    return false;
+  }
+}
+
+/**
  * Solde d'un compte en wei (bigint).
  * @param {string} address
  * @param {import('ethers').Provider} [provider] défaut : lecture RPC

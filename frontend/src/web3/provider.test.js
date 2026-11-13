@@ -22,6 +22,41 @@ async function loadProvider() {
   return import('./provider');
 }
 
+describe('revokeWalletPermission', () => {
+  afterEach(() => {
+    delete window.ethereum;
+  });
+
+  it('révoque l’accès du site quand le portefeuille le permet', async () => {
+    const request = vi.fn(async ({ method }) => {
+      if (method === 'wallet_revokePermissions') return null;
+      if (method === 'eth_accounts') return [ACCOUNT];
+      throw new Error(`Méthode inattendue : ${method}`);
+    });
+    window.ethereum = { request, on: vi.fn(), removeListener: vi.fn() };
+    const { revokeWalletPermission } = await loadProvider();
+
+    await expect(revokeWalletPermission()).resolves.toBe(true);
+    expect(request).toHaveBeenCalledWith({
+      method: 'wallet_revokePermissions',
+      params: [{ eth_accounts: {} }],
+    });
+  });
+
+  it('reste silencieux si le portefeuille ne sait pas révoquer', async () => {
+    installWallet('0x7a69');
+    const { revokeWalletPermission } = await loadProvider();
+
+    await expect(revokeWalletPermission()).resolves.toBe(false);
+  });
+
+  it('ne fait rien sans portefeuille', async () => {
+    const { revokeWalletPermission } = await loadProvider();
+
+    await expect(revokeWalletPermission()).resolves.toBe(false);
+  });
+});
+
 describe('getSigner', () => {
   afterEach(() => {
     delete window.ethereum;

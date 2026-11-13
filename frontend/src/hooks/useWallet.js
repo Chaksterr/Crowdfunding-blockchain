@@ -11,7 +11,7 @@ import {
   setError,
 } from '../store/walletSlice';
 import { mapContractError } from '../web3/errors';
-import { ensureChain, watchWallet } from '../web3/provider';
+import { ensureChain, revokeWalletPermission, watchWallet } from '../web3/provider';
 
 export const selectWallet = (state) => state.wallet;
 export const selectAccount = (state) => state.wallet.account;
@@ -40,7 +40,10 @@ export function useWallet() {
     }
   }, [dispatch]);
 
-  const disconnect = useCallback(() => {
+  const disconnect = useCallback(async () => {
+    // Révoque l'accès du site dans MetaMask, sinon le portefeuille se
+    // reconnecte tout seul à l'hydratation suivante (eth_accounts).
+    await revokeWalletPermission();
     dispatch(disconnected());
   }, [dispatch]);
 

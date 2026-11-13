@@ -262,7 +262,9 @@ export default function WalletButton() {
               className="flex min-h-11 w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50"
             >
               Déconnecter
-              <span className="text-[11px] font-normal text-rose-600">localement</span>
+              <span className="text-[11px] font-normal text-rose-600">
+                révoque l’accès
+              </span>
             </button>
           </div>
         </div>
