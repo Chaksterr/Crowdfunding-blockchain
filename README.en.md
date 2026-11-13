@@ -1,363 +1,243 @@
-# Blockchain crowdfunding platform
+<div align="center">
 
-**🌐 Language / Langue :** English · [Français](README.md)
+<img src="docs/commun/logo.svg" alt="Cagnotte logo" width="88">
 
-A decentralized crowdfunding application (DApp) on Ethereum: funds are held by a smart contract, released by a donor vote, and returned to donors if the goal is not reached.
+# Cagnotte
+
+**The code holds the funds, the donors decide.**
+
+*A decentralised crowdfunding platform on Ethereum: funds are held by a smart contract, released by a donor vote, and returned to each donor if the goal is not reached.*
+
+<br>
+
+<img src="https://img.shields.io/badge/SOLIDITY-0.8.24-363636?style=for-the-badge&logo=solidity&logoColor=white&labelColor=555555" alt="Solidity 0.8.24">
+<img src="https://img.shields.io/badge/HARDHAT-2.29-F7B600?style=for-the-badge&labelColor=555555" alt="Hardhat 2.29">
+<img src="https://img.shields.io/badge/ETHEREUM-LOCAL-3C3C3D?style=for-the-badge&logo=ethereum&logoColor=white&labelColor=555555" alt="Ethereum">
+<img src="https://img.shields.io/badge/ETHERS.JS-6.17-2535A0?style=for-the-badge&labelColor=555555" alt="ethers.js 6.17">
+<img src="https://img.shields.io/badge/METAMASK-WALLET-E2761B?style=for-the-badge&logo=metamask&logoColor=white&labelColor=555555" alt="MetaMask">
+<br>
+<img src="https://img.shields.io/badge/REACT-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=white&labelColor=555555" alt="React 18.3">
+<img src="https://img.shields.io/badge/VITE-5.4-646CFF?style=for-the-badge&logo=vite&logoColor=white&labelColor=555555" alt="Vite 5.4">
+<img src="https://img.shields.io/badge/TAILWIND_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white&labelColor=555555" alt="Tailwind CSS 3.4">
+<img src="https://img.shields.io/badge/REDUX_TOOLKIT-2.14-764ABC?style=for-the-badge&logo=redux&logoColor=white&labelColor=555555" alt="Redux Toolkit 2.14">
+<img src="https://img.shields.io/badge/NODE.JS-22+-339933?style=for-the-badge&logo=nodedotjs&logoColor=white&labelColor=555555" alt="Node.js 22+">
+
+<br><br>
+
+**[🎬 Demo video](#2-demo)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/rapport/rapport.tex)**
+
+**🌐 Language / Langue:** [Français](README.md) · English
+
+</div>
+
+---
 
 ## Contents
 
 1. [Introduction](#1-introduction)
-2. [General architecture](#2-general-architecture)
-3. [Tools used](#3-tools-used)
-4. [Project tree](#4-project-tree)
+2. [Demo](#2-demo)
+3. [Architecture](#3-architecture)
+4. [Tools](#4-tools)
 5. [Features](#5-features)
 6. [Installation](#6-installation)
-7. [Team members](#7-team-members)
+7. [Team](#7-team)
 
 ---
 
 ## 1. Introduction
 
-On a classic crowdfunding platform, donors' money is entrusted to an intermediary. The intermediary decides when the creator receives the funds and whether donors get refunded if the campaign fails: you have to trust it.
+On a classic crowdfunding platform, donors hand their money to an intermediary. The intermediary decides when the creator gets the funds and whether donors are refunded if the project fails: donors have to trust it.
 
-This project replaces that intermediary with Ethereum **smart contracts**. A creator launches a campaign with a **goal**, a **minimum donation** and a **duration**. Donors send ETH, which stays locked in the campaign's contract until the deadline. Then:
+**Cagnotte** replaces that intermediary with Ethereum **smart contracts**. A creator starts a campaign with a **goal**, a **minimum donation** and a **duration**. Donations stay locked in the campaign contract until the deadline. Then:
 
-- **goal reached**: the creator can withdraw the funds, but only for requests approved by at least **50% of the donors**;
-- **goal not reached**: every donor gets back **exactly what they gave**.
+- ✅ **goal reached**: the creator withdraws funds, only for requests approved by at least **50 % of donors**;
+- ↩️ **goal missed**: every donor gets back **exactly what they gave**.
 
-The rules are written in the code and cannot be changed after deployment, neither by the creator nor by the team. The application runs on a local Ethereum blockchain (Hardhat) and is used from the browser with MetaMask.
-
-| | Classic crowdfunding | This project |
+| | Classic crowdfunding | Cagnotte |
 | --- | --- | --- |
-| Who holds the money? | An intermediary | The campaign's contract |
+| Who holds the money? | An intermediary | The campaign contract |
 | Who sets the rules? | The platform, which can change them | The code, fixed at deployment |
-| Who releases the funds? | The platform | At least 50% of the donors, by vote |
-| Refund if the campaign fails | Depends on the platform's policy | Guaranteed: each donor claims their money back from the contract |
+| Who releases the funds? | The platform | At least 50 % of donors, by vote |
+| Refund on failure | Depends on the platform's policy | Guaranteed by the contract |
 
 ---
 
-## 2. General architecture
+## 2. Demo
 
-The project is built from two smart contracts deployed on a local blockchain, a React web application, and MetaMask, which signs the user's transactions.
+<div align="center">
+
+<a href="docs/commun/demo/demo-cagnotte.mp4">
+  <img src="docs/commun/demo/apercu.jpg" alt="Play the demo video" width="720">
+</a>
+
+**🎬 [Demo video](docs/commun/demo/demo-cagnotte.mp4)** (in French)<br>
+<sub>Home · successful campaign (donations, vote, withdrawal) · failed campaign (refunds) · browsing without MetaMask</sub>
+
+<br>
+
+| Home | Vote and withdrawal | On a phone |
+| :---: | :---: | :---: |
+| <img src="docs/commun/captures/01-accueil-ordinateur.png" alt="Home" width="300"> | <img src="docs/commun/captures/04-campagne-reussie-vote-ordinateur.png" alt="Vote and withdrawal" width="300"> | <img src="docs/commun/captures/03-campagne-en-cours-telephone.png" alt="Phone version" width="130"> |
+
+<sub>All screenshots: <a href="docs/commun/captures/">docs/commun/captures/</a></sub>
+
+</div>
+
+---
+
+## 3. Architecture
 
 ```mermaid
-flowchart TB
-    U(["User<br/>creator · donor · visitor"])
-
-    subgraph WEB["Web application (frontend/)"]
-        UI["React pages<br/>Tailwind CSS"]
-        W3["Web3 layer<br/>ethers.js v6"]
-        ST["Redux store<br/>wallet state"]
-    end
-
-    MM["MetaMask<br/>signs transactions"]
-
-    subgraph CHAIN["Local Hardhat blockchain"]
-        RPC["JSON-RPC node<br/>127.0.0.1:8545<br/>chainId 31338"]
-        F["Crowdfunding.sol<br/>factory"]
-        P["Project.sol<br/>one contract per campaign"]
-    end
-
-    U --> UI
-    UI --> W3
-    UI <--> ST
-    W3 -- "write" --> MM
-    MM -- "signed transaction" --> RPC
-    W3 -- "free read" --> RPC
-    RPC --> F
-    RPC --> P
-    F -- "creates" --> P
-    P -. "events" .-> W3
+flowchart LR
+    U(["User"]) --> UI["Web app<br/>React · ethers.js"]
+    UI -- "write" --> MM["MetaMask"]
+    MM -- "signed transaction" --> P
+    UI -. "read" .-> P
+    F["Crowdfunding.sol<br/>factory"] -- "creates" --> P["Project.sol<br/>one campaign"]
 ```
 
-| Component | Role |
+| Part | Role |
 | --- | --- |
-| `Crowdfunding.sol` | The **factory**: creates a `Project` contract for each new campaign and keeps the list of all campaigns. |
-| `Project.sol` | One **campaign**: holds its own funds, records the creator and the donors, and handles withdrawal requests, votes and refunds. |
-| Hardhat node | Local Ethereum blockchain, with 20 test accounts funded with 10,000 ETH each. |
-| MetaMask | Browser wallet: signs every transaction (create, donate, vote, withdraw, refund). |
-| Web application | Reads campaigns directly from the node, even without MetaMask, and goes through MetaMask for every write. |
+| `Crowdfunding.sol` | The **factory**: creates one `Project` contract per campaign and keeps the list. |
+| `Project.sol` | A **campaign**: holds its funds, donors, withdrawal requests, votes and refunds. |
+| Web app | Reads campaigns straight from the blockchain, **even without MetaMask**, and uses MetaMask for every write. |
+| Hardhat node | Local Ethereum blockchain (`127.0.0.1:8545`, chain `31338`), 20 test accounts with 10,000 ETH each. |
 
-Design principles:
+**Design principles**
 
-- **One contract per campaign**: each campaign's funds are kept separate from the others.
-- **Free reads, signed writes**: viewing a campaign costs nothing and needs no wallet; every action is a transaction signed in MetaMask.
-- **Computed state, not stored**: `getStatus()` derives the campaign's state from the current time and the total raised. No transaction is needed to close a campaign.
-- **Live updates**: every action emits an event (`DonationReceived`, `WithdrawVote`…) that the application listens to so it refreshes on its own.
-- **Link between contracts and interface**: after deployment, `npm run sync` copies the ABIs and the factory address into `frontend/src/`.
-
-### How a donation flows
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor D as Donor
-    participant UI as Web application
-    participant MM as MetaMask
-    participant N as Hardhat node
-    participant P as Project.sol
-
-    D->>UI: Enters an amount and clicks "Donate"
-    UI->>MM: Requests a signature for contribute()
-    MM->>D: Shows the transaction to confirm
-    D->>MM: Confirms
-    MM->>N: Sends the signed transaction
-    N->>P: Executes contribute()
-    P->>P: Checks the deadline and the minimum donation
-    P-->>N: Records the donation and emits DonationReceived
-    N-->>UI: Transaction confirmed
-    UI->>N: Reloads the campaign (total, donors)
-    UI-->>D: "Donation sent" notification and updated progress
-```
+- **One contract per campaign**: each campaign's funds are isolated.
+- **Computed state, not stored**: `getStatus()` derives the state from the time and the amount raised; no closing transaction.
+- **Live updates**: the interface listens to contract events (`DonationReceived`, `WithdrawVote`…).
 
 ---
 
-## 3. Tools used
+## 4. Tools
 
-| Area | Tool | Version | Used for |
-| --- | --- | --- | --- |
-| **Smart contracts** | Solidity | 0.8.24 | Contract language |
-| | Hardhat + Hardhat Toolbox | 2.29 / 5.0 | Compilation, local blockchain, running tests and scripts |
-| | Hardhat Ignition | 0.15 | Deploying the factory |
-| **Tests** | Mocha + Chai | 11 / 4 | Contract tests |
-| | solidity-coverage | 0.8 | Contract code coverage |
-| | Vitest + Testing Library + jsdom | 2.1 / 16 / 25 | Web application tests |
-| | Playwright | 1.64 | End-to-end tests in Chromium: scenarios A to F |
-| **Frontend** | React | 18.3 | User interface |
-| | Vite | 5.4 | Dev server and build |
-| | Tailwind CSS | 3.4 | Styling |
-| | Redux Toolkit + React Redux | 2.14 / 9.3 | Global state (connected wallet) |
-| | React Router | 6.30 | Navigation between pages |
-| | ethers.js | 6.17 | Reading contracts and sending transactions |
-| **Wallet** | MetaMask | extension | Signing transactions |
-| **Quality** | GitHub Actions | | Continuous integration: compile, test, coverage, build |
-| | Git `pre-commit` hook | | Compile, tests and checks before every commit |
-| **Environment** | Node.js + npm | 22 or later (24 in CI) | Running all the tools |
+| Area | Tools |
+| --- | --- |
+| **Smart contracts** | Solidity 0.8.24, Hardhat 2.29, Hardhat Ignition, ethers.js 6 |
+| **Web interface** | React 18, Vite 5, Tailwind CSS 3, Redux Toolkit, React Router |
+| **Wallet** | MetaMask |
+| **Testing** | Mocha + Chai, Vitest + Testing Library, Playwright |
+| **Quality** | GitHub Actions, Git `pre-commit` hook |
+| **Environment** | Node.js 22 or later, npm |
 
----
-
-## 4. Project tree
-
-```text
-plateforme-crowdfunding-blockchain/
-├── contracts/
-│   ├── Crowdfunding.sol               # factory: creates and lists campaigns
-│   ├── Project.sol                    # one campaign: funds, votes, refunds
-│   └── test/
-│       └── ReentrancyAttacker.sol     # malicious contract used by the tests
-├── test/                              # contract tests (Mocha + Chai)
-│   ├── Crowdfunding.js                # factory and deployment module
-│   ├── Project.js                     # every campaign function, security
-│   ├── ProjectBoundaries.js           # boundary values and invariants
-│   └── Lifecycle.js                   # full end-to-end scenarios
-├── e2e/                               # end-to-end tests (Playwright)
-│   ├── playwright.config.js           # Hardhat node, production build, Chromium
-│   ├── support/                       # test wallet, direct blockchain access
-│   └── tests/                         # scenarios A to F, network, screenshots
-├── ignition/modules/
-│   └── Crowdfunding.js                # Hardhat Ignition deployment
-├── scripts/
-│   ├── syncAbi.js                     # copies the ABIs and address to frontend/src
-│   ├── seedDemo.js                    # creates 3 demo campaigns
-│   ├── simulate.js                    # replays scenarios A and B in the terminal
-│   ├── fastForward.js                 # moves the local blockchain clock forward
-│   ├── exportReport.js                # exports the report to PDF
-│   └── precommit.sh                   # checks run before every commit
-├── frontend/                          # web application (React + Vite)
-│   ├── index.html
-│   ├── vite.config.js                 # Vite and Vitest configuration
-│   ├── tailwind.config.js
-│   ├── .env.example                   # VITE_RPC_URL, VITE_FACTORY_ADDRESS
-│   └── src/
-│       ├── main.jsx                   # entry point: Redux, router, error boundary
-│       ├── App.jsx                    # page routes
-│       ├── config.js                  # network, RPC URL, factory address
-│       ├── deployed.json              # factory address (npm run sync)
-│       ├── abi/                       # contract ABIs (npm run sync)
-│       ├── web3/                      # ethers.js: reads, transactions, errors
-│       ├── store/                     # Redux store (wallet)
-│       ├── hooks/                     # useWallet, useTransaction, useChainEvents…
-│       ├── components/                # header, cards, progress bars, notifications
-│       └── pages/                     # Home, Create, Details, My contributions
-├── docs/
-│   ├── commun/
-│   │   ├── CahierDesCharges.pdf       # project specification
-│   │   ├── GUIDE_DEPLOIEMENT.md       # detailed local deployment, troubleshooting
-│   │   ├── GUIDE_METAMASK_HARDHAT.md  # MetaMask setup
-│   │   ├── RECETTE.md                 # manual test scenarios A to F
-│   │   ├── captures/                  # screenshots (npm run e2e:captures)
-│   │   ├── rapport/                   # project report
-│   │   └── presentation/              # slides and demo script
-│   └── etudiant1-smart-contracts/
-│       └── phase1.md                  # smart contracts explained in detail
-├── .github/workflows/ci.yml           # continuous integration (GitHub Actions)
-├── .githooks/pre-commit               # runs scripts/precommit.sh
-├── hardhat.config.js                  # Solidity 0.8.24, localhost network (31338)
-├── .solcover.js                       # coverage configuration
-├── package.json                       # project npm scripts
-├── README.md
-└── README.en.md
-```
-
-Frontend tests (`*.test.js`, `*.test.jsx`) sit next to the files they test. The documentation in `docs/` is written in French.
+**Test results:** 82 contract tests (100 % coverage) · 198 interface tests · 12 end-to-end tests.
 
 ---
 
 ## 5. Features
 
-### Main features
-
 | Ref. | Feature | Actor | Contract function |
 | --- | --- | --- | --- |
 | F1 | Create a campaign: title, description, goal, minimum donation, duration | Creator | `Crowdfunding.createProject()` |
-| F2 | Donate ETH before the deadline, at least the minimum donation | Donor | `Project.contribute()` |
-| F3 | View a campaign: goal, total raised, donors, time left, state | Everyone | `getStatus()`, `timeLeft()`, `getDonors()` |
-| F4 | Request a withdrawal (amount, reason, recipient) after a successful campaign | Creator | `createWithdrawRequest()` |
-| F5 | Vote on a request, then withdraw the funds if at least 50% of the donors approved it | Donors, then creator | `voteWithdrawRequest()`, `withdrawRequestedAmount()` |
-| F6 | Get your money back if the goal is not reached by the deadline | Donor | `refund()` |
-| F7 | Use all of these features from a web interface connected to MetaMask | Everyone | `frontend/` |
+| F2 | Donate ETH before the deadline, at least the minimum | Donor | `Project.contribute()` |
+| F3 | View a campaign: goal, total, donors, time left, state | Everyone | `getStatus()`, `timeLeft()`, `getDonors()` |
+| F4 | Request a withdrawal (amount, reason, recipient) | Creator | `createWithdrawRequest()` |
+| F5 | Vote, then withdraw if at least 50 % of donors approve | Donors, creator | `voteWithdrawRequest()`, `withdrawRequestedAmount()` |
+| F6 | Get your donation back if the goal is missed | Donor | `refund()` |
+| F7 | Do everything from a web interface connected to MetaMask | Everyone | `frontend/` |
 
 ### Campaign lifecycle
 
 ```mermaid
-flowchart TB
-    S0(("&nbsp;")) -->|"createProject()"| ON("<b>Ongoing</b><br/>donors call contribute()")
-    ON -->|"deadline passed,<br/>goal reached"| OK("<b>Successful</b><br/>withdrawal requests, votes,<br/>withdrawal if at least 50% of donors")
-    ON -->|"deadline passed,<br/>goal not reached"| KO("<b>Failed</b><br/>each donor calls refund()<br/>and gets their money back")
-
-    classDef startPoint fill:#334155,stroke:#334155
+flowchart LR
+    EC("Ongoing") -->|"goal reached"| R("Successful<br/>vote, withdrawal")
+    EC -->|"goal missed"| E("Failed<br/>refunds")
     classDef ongoing fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
     classDef success fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef failed fill:#fee2e2,stroke:#dc2626,color:#7f1d1d
-    class S0 startPoint
-    class ON ongoing
-    class OK success
-    class KO failed
+    class EC ongoing
+    class R success
+    class E failed
 ```
 
-The state is never stored: `getStatus()` recomputes it on every read from the current time and the total raised.
+### Rules and security
 
-### Business rules
+- **Business rules**: strictly positive parameters, no donation after the deadline or below the minimum, funds locked until the deadline, withdrawal only with at least 50 % approval, exact one-time refund.
+- **Reentrancy**: the contribution is reset to zero, or the request marked as executed, **before** ETH is sent.
+- **Access control**: only the creator withdraws; only donors vote; one vote per donor per request.
+- **Fixed rules**: creator, goal, minimum donation and deadline are `immutable`.
 
-| Rule | Description |
-| --- | --- |
-| RG1 | The goal, minimum donation and duration must be greater than 0, so the deadline is always in the future. |
-| RG2 | No donation is accepted after the deadline or below the minimum donation. |
-| RG3 | Funds stay locked in the contract until the deadline. |
-| RG4 | A withdrawal is executed only if at least 50% of the donors approved it (one vote per donor). |
-| RG5 | Each donor gets back exactly their contribution, only once. |
+<details>
+<summary><b>Project structure</b></summary>
 
-### Security
+```text
+Crowdfunding-blockchain/
+├── contracts/                 # Crowdfunding.sol (factory), Project.sol (campaign)
+├── test/                      # contract tests (Mocha + Chai)
+├── e2e/                       # end-to-end tests (Playwright)
+├── ignition/modules/          # deployment with Hardhat Ignition
+├── scripts/                   # ABI sync, demo campaigns, clock fast-forward
+├── frontend/                  # web app (React + Vite)
+│   └── src/                   # pages, components, web3, Redux store, hooks
+├── docs/commun/
+│   ├── captures/              # screenshots
+│   ├── demo/                  # demo video
+│   └── rapport/               # project report (LaTeX, French)
+├── .github/workflows/ci.yml   # continuous integration
+└── hardhat.config.js          # Solidity 0.8.24, local network (31338)
+```
 
-- **Reentrancy protection**: the contribution is reset to zero, or the request marked as executed, **before** the ETH is sent.
-- **Access control**: only the creator can request and execute a withdrawal; only donors can vote.
-- **No double actions**: one vote per donor per request, one refund per donor, one execution per request.
-- **Failed transfer, reverted transaction**: if sending ETH fails, nothing is changed.
-- **Fixed rules**: the creator, goal, minimum donation and deadline are `immutable`.
-
-### Web interface
-
-- **Home**: every campaign with its progress bar, time left and state; filters (ongoing, successful, failed) and sorting (recent, amount raised, time left).
-- **Create a campaign**: a form that checks the fields before sending.
-- **Campaign details**: donation with suggested amounts, donor list, withdrawal requests with a vote bar. The available actions (donate, request a withdrawal, vote, withdraw, get a refund) depend on the campaign's state and the connected account's role.
-- **My contributions**: the campaigns supported by the connected account and the total given.
-- **Without MetaMask**: campaigns can still be viewed in read-only mode.
-- **Right network**: detects a wrong network and offers a button to switch to Hardhat Local (31338).
-- **Clear feedback**: a transaction preview before signing, success or failure notifications, and contract errors translated into plain French.
-- **Responsive**: works on phones and computers.
-
-The interface is in French.
-
-<p align="center">
-  <img src="docs/commun/captures/01-accueil-ordinateur.png" alt="Home: statistics and ongoing campaigns" height="220">
-  <img src="docs/commun/captures/04-campagne-reussie-vote-ordinateur.png" alt="Successful campaign: donor vote and withdrawal" height="220">
-  <img src="docs/commun/captures/03-campagne-en-cours-telephone.png" alt="Campaign page on a phone" height="220">
-</p>
-<p align="center"><em>Home · vote and withdrawal · phone version. All screenshots: <a href="docs/commun/captures/">docs/commun/captures/</a>.</em></p>
+</details>
 
 ---
 
 ## 6. Installation
 
-### Prerequisites
-
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org/) 22 or later (LTS; CI uses Node 24), with npm
-- The [MetaMask](https://metamask.io/) browser extension
-
-### Step 1 — Clone the repository
+**Requirements:** [Git](https://git-scm.com/), [Node.js](https://nodejs.org/) 22 or later with npm, and the [MetaMask](https://metamask.io/) extension.
 
 ```bash
-git clone https://github.com/Chaksterr/plateforme-crowdfunding-blockchain.git
-cd plateforme-crowdfunding-blockchain
-```
-
-### Step 2 — Install the dependencies and check
-
-```bash
-npm install     # Hardhat and the contract tooling
-npm test        # should print: 82 passing
-```
-
-### Step 3 — Start the local blockchain (terminal 1)
-
-```bash
-npm run node
-```
-
-Keep this terminal open. It prints 20 test accounts, each funded with 10,000 ETH, with their private keys.
-
-### Step 4 — Deploy the contracts (terminal 2)
-
-```bash
-npm run deploy  # deploys the factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
-npm run sync    # copies the ABIs and the address into frontend/src
-npm run seed    # optional: 3 demo campaigns (ongoing, successful, failed)
-```
-
-### Step 5 — Start the web application (terminal 2)
-
-```bash
-cd frontend
+# 1. Clone and check
+git clone https://github.com/Chaksterr/Crowdfunding-blockchain.git
+cd Crowdfunding-blockchain
 npm install
-npm run dev     # http://localhost:5173
+npm test              # should print: 82 passing
+
+# 2. Terminal 1: start the local blockchain (keep it open)
+npm run node
+
+# 3. Terminal 2: deploy and start the app
+npm run deploy        # factory: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+npm run sync          # copies the ABIs and address into frontend/src
+npm run seed          # optional: 3 demo campaigns
+cd frontend && npm install && npm run dev   # http://localhost:5173
 ```
 
-### Step 6 — Set up MetaMask
+**Set up MetaMask**
 
-1. Add the network: **Settings → Networks → Add a network manually**
-   - Name: `Hardhat Local`
-   - RPC URL: `http://127.0.0.1:8545`
-   - Chain ID: `31338`
-   - Symbol: `ETH`
-2. Import a few test accounts using the private keys printed in terminal 1. `npm run seed` uses account #0 as the creator and accounts #1 to #3 as donors.
+1. Add the **Hardhat Local** network: RPC URL `http://127.0.0.1:8545`, chain ID `31338`, symbol `ETH`.
+2. Import a few test accounts with the private keys printed by `npm run node`.
 3. Open <http://localhost:5173> and click **Connecter MetaMask** (Connect MetaMask).
 
-> ⚠️ These test keys are public. Never use them on a real network and never send real funds to these addresses.
+> ⚠️ The test keys are public: never use them on a real network.
+>
+> 🔁 After restarting `npm run node`: run `npm run deploy:reset`, then in MetaMask **Settings → Advanced → Clear activity tab data**.
 
-> 🔁 After every restart of `npm run node`: run `npm run deploy:reset` again (then `npm run seed` if needed), and in MetaMask choose **Settings → Advanced → Clear activity tab data**, otherwise transactions get stuck ("nonce too high").
+<details>
+<summary><b>Useful commands</b></summary>
 
-### Useful commands
-
-| Command | What it does |
+| Command | Effect |
 | --- | --- |
 | `npm run coverage` | Contract coverage report |
 | `npm run simulate` | Replays scenarios A (success) and B (failure) in the terminal |
-| `SECONDS=120 npm run ff` | Moves the blockchain clock forward by 120 seconds, for example to end a campaign |
+| `SECONDS=120 npm run ff` | Moves the blockchain clock forward by 120 seconds |
 | `npm run deploy:reset` | Redeploys the factory after a node restart |
-| `npm test` (in `frontend/`) | Web application tests: 198 tests |
-| `npm run e2e` | End-to-end tests: scenarios A to F in Chromium (first time: `npx playwright install chromium`) |
-| `npm run e2e:captures` | Regenerates the report screenshots in `docs/commun/captures/` |
-| `npm run report:pdf` | Regenerates the report PDF (`docs/commun/rapport/RAPPORT.pdf`) |
-| `npm run build` (in `frontend/`) | Production build |
+| `npm test` (in `frontend/`) | Web app tests |
+| `npm run e2e` | End-to-end tests (first time: `npx playwright install chromium`) |
+| `npm run e2e:captures` | Regenerates the screenshots |
 
-Detailed guide (multi-PC, troubleshooting, in French): [docs/commun/GUIDE_DEPLOIEMENT.md](docs/commun/GUIDE_DEPLOIEMENT.md).
+</details>
 
 ---
 
-## 7. Team members
+## 7. Team
 
-- Yessine Abdelmaksoud
-- Mohamed Ali Abid
-- Ahmad Chakcha
-- Mohamed Ali Djemal
+| Member | Role |
+| --- | --- |
+| Mohamed Ali Djemal | Web interface and Web3 |
+| Mohamed Ali Abid | Acceptance testing and demo |
+| Yessine Abdelmaksoud | Testing and deployment |
+| Ahmad Chakcha | Smart contracts and security |
+
+<div align="center"><sub>Project for the Blockchain course · Academic year 2026 – 2027</sub></div>
