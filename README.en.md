@@ -24,7 +24,7 @@
 
 <br><br>
 
-**[🎬 Demo video](#2-demo)** · **[🖼️ Slides](https://canva.link/udw0ogomc6fex0b)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
+**[🎬 Demo video](#2-demo)** · **[🖼️ Slides](docs/commun/documents/Presentation_Financement_Participatif.pdf)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
 
 **🌐 Language / Langue:** [Français](README.md) · English
 
@@ -64,7 +64,7 @@ On a classic crowdfunding platform, donors hand their money to an intermediary. 
 
 ## 2. Demo
 
-> 🖼️ **Quick overview:** the [project slides](https://canva.link/udw0ogomc6fex0b) (in French) sum up the problem, the solution, the architecture and the results.
+> 🖼️ **Quick overview:** the [project slides](docs/commun/documents/Presentation_Financement_Participatif.pdf) (in French) sum up the problem, the solution, the architecture and the results.
 
 <div align="center">
 
@@ -124,7 +124,7 @@ flowchart LR
 | **Quality** | GitHub Actions, Git `pre-commit` hook |
 | **Environment** | Node.js 22 or later, npm |
 
-**Test results:** 82 contract tests (100 % coverage) · 198 interface tests · 12 end-to-end tests.
+**Test results:** 82 contract tests (100 % coverage) · 204 interface tests · 12 end-to-end tests.
 
 ---
 
@@ -176,7 +176,7 @@ Crowdfunding-blockchain/
 ├── docs/commun/
 │   ├── captures/              # screenshots
 │   ├── demo/                  # demo video
-│   └── documents/             # project report and specification (PDF, French)
+│   └── documents/             # report, slides and specification (PDF, French)
 ├── .github/workflows/ci.yml   # continuous integration
 └── hardhat.config.js          # Solidity 0.8.24, local network (31338)
 ```

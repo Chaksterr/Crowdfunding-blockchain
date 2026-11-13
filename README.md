@@ -24,7 +24,7 @@
 
 <br><br>
 
-**[🎬 Démo vidéo](#2-démonstration)** · **[🖼️ Présentation](https://canva.link/udw0ogomc6fex0b)** · **[⚙️ Installation](#6-installation)** · **[📄 Rapport](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
+**[🎬 Démo vidéo](#2-démonstration)** · **[🖼️ Présentation](docs/commun/documents/Presentation_Financement_Participatif.pdf)** · **[⚙️ Installation](#6-installation)** · **[📄 Rapport](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
 
 **🌐 Langue / Language :** Français · [English](README.en.md)
 
@@ -64,7 +64,7 @@ Sur une plateforme de financement participatif classique, l'argent des donateurs
 
 ## 2. Démonstration
 
-> 🖼️ **Découvrir le projet simplement :** la [présentation du projet](https://canva.link/udw0ogomc6fex0b) résume le problème, la solution, l'architecture et les résultats en quelques slides.
+> 🖼️ **Découvrir le projet simplement :** la [présentation du projet](docs/commun/documents/Presentation_Financement_Participatif.pdf) résume le problème, la solution, l'architecture et les résultats en quelques slides.
 
 <div align="center">
 
@@ -124,7 +124,7 @@ flowchart LR
 | **Qualité** | GitHub Actions, hook Git `pre-commit` |
 | **Environnement** | Node.js 22 ou plus, npm |
 
-**Résultats des tests :** 82 tests des contrats (couverture 100 %) · 198 tests de l'interface · 12 tests de bout en bout.
+**Résultats des tests :** 82 tests des contrats (couverture 100 %) · 204 tests de l'interface · 12 tests de bout en bout.
 
 ---
 
@@ -176,7 +176,7 @@ Crowdfunding-blockchain/
 ├── docs/commun/
 │   ├── captures/              # captures d'écran
 │   ├── demo/                  # vidéo de démonstration
-│   └── documents/             # rapport du projet et cahier des charges (PDF)
+│   └── documents/             # rapport, présentation et cahier des charges (PDF)
 ├── .github/workflows/ci.yml   # intégration continue
 └── hardhat.config.js          # Solidity 0.8.24, réseau local (31338)
 ```
