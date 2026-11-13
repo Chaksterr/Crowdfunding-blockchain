@@ -45,3 +45,6 @@ Thumbs.db
 
 # ===== Notes personnelles (non versionnées) =====
 private/
+
+# ===== Graphe de connaissance Understand-Anything (généré localement) =====
+.ua/
