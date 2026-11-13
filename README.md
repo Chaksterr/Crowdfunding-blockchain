@@ -76,9 +76,6 @@ Sur une plateforme de financement participatif classique, l'argent des donateurs
 <sub>Accueil · campagne réussie (dons, vote, retrait) · campagne échouée (remboursements) · consultation sans MetaMask</sub>
 
 <br>
-<sub>Copie locale : <a href="docs/commun/demo/demo-cagnotte.mp4">télécharger l'enregistrement</a> (18,8 Mo) — GitHub ne peut pas lire directement un fichier de cette taille.</sub>
-
-<br>
 
 | Accueil | Vote et retrait | Sur téléphone |
 | :---: | :---: | :---: |

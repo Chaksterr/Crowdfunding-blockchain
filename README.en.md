@@ -76,9 +76,6 @@ On a classic crowdfunding platform, donors hand their money to an intermediary. 
 <sub>Home · successful campaign (donations, vote, withdrawal) · failed campaign (refunds) · browsing without MetaMask</sub>
 
 <br>
-<sub>Local copy: <a href="docs/commun/demo/demo-cagnotte.mp4">download the recording</a> (18.8 MB) — GitHub cannot display a file that large in the browser.</sub>
-
-<br>
 
 | Home | Vote and withdrawal | On a phone |
 | :---: | :---: | :---: |
