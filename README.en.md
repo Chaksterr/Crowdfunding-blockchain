@@ -76,6 +76,9 @@ On a classic crowdfunding platform, donors hand their money to an intermediary. 
 <sub>Home · successful campaign (donations, vote, withdrawal) · failed campaign (refunds) · browsing without MetaMask</sub>
 
 <br>
+<sub>Inline playback not showing up? <a href="https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link">Watch the video on Google Drive</a></sub>
+
+<br>
 
 | Home | Vote and withdrawal | On a phone |
 | :---: | :---: | :---: |

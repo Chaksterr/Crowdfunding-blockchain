@@ -76,6 +76,9 @@ Sur une plateforme de financement participatif classique, l'argent des donateurs
 <sub>Accueil · campagne réussie (dons, vote, retrait) · campagne échouée (remboursements) · consultation sans MetaMask</sub>
 
 <br>
+<sub>La lecture intégrée ne s'affiche pas ? <a href="https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link">Voir la vidéo sur Google Drive</a></sub>
+
+<br>
 
 | Accueil | Vote et retrait | Sur téléphone |
 | :---: | :---: | :---: |
