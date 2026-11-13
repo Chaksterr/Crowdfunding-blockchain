@@ -68,15 +68,15 @@ Sur une plateforme de financement participatif classique, l'argent des donateurs
 
 <div align="center">
 
-<a href="docs/commun/demo/demo-cagnotte.mp4">
+<a href="https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link">
   <img src="docs/commun/demo/apercu.jpg" alt="Lire la vidéo de démonstration" width="720">
 </a>
 
-**🎬 [Vidéo de démonstration](docs/commun/demo/demo-cagnotte.mp4)**<br>
+**🎬 [Vidéo de démonstration](https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link)**<br>
 <sub>Accueil · campagne réussie (dons, vote, retrait) · campagne échouée (remboursements) · consultation sans MetaMask</sub>
 
 <br>
-<sub>La lecture intégrée ne s'affiche pas ? <a href="https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link">Voir la vidéo sur Google Drive</a></sub>
+<sub>Copie locale : <a href="docs/commun/demo/demo-cagnotte.mp4">télécharger l'enregistrement</a> (18,8 Mo) — GitHub ne peut pas lire directement un fichier de cette taille.</sub>
 
 <br>
 

@@ -68,15 +68,15 @@ On a classic crowdfunding platform, donors hand their money to an intermediary. 
 
 <div align="center">
 
-<a href="docs/commun/demo/demo-cagnotte.mp4">
+<a href="https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link">
   <img src="docs/commun/demo/apercu.jpg" alt="Play the demo video" width="720">
 </a>
 
-**🎬 [Demo video](docs/commun/demo/demo-cagnotte.mp4)** (in French)<br>
+**🎬 [Demo video](https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link)** (in French)<br>
 <sub>Home · successful campaign (donations, vote, withdrawal) · failed campaign (refunds) · browsing without MetaMask</sub>
 
 <br>
-<sub>Inline playback not showing up? <a href="https://drive.google.com/file/d/1W5DdXBL9kOHhmMVka4sNRygGTXs_MiMH/view?usp=drive_link">Watch the video on Google Drive</a></sub>
+<sub>Local copy: <a href="docs/commun/demo/demo-cagnotte.mp4">download the recording</a> (18.8 MB) — GitHub cannot display a file that large in the browser.</sub>
 
 <br>
 
