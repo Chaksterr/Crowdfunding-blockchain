@@ -17,6 +17,11 @@ export function useTransaction() {
       setState({ status: 'success', error: null });
       return { ok: true, result };
     } catch (error) {
+      if (import.meta.env.DEV) {
+        // Erreur brute du portefeuille : indispensable pour diagnostiquer un
+        // refus que mapContractError ne reconnaît pas encore.
+        console.error('[transaction] erreur brute :', error);
+      }
       const message = mapContractError(error);
       setState({ status: 'error', error: message });
       return { ok: false, error: message };

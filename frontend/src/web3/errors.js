@@ -7,6 +7,21 @@ const MISSING_METAMASK_MESSAGE =
 const WRONG_NETWORK_MESSAGE =
   'Mauvais réseau : passez sur Hardhat Local (31337) pour signer cette transaction.';
 
+const INSUFFICIENT_FUNDS_MESSAGE =
+  'Solde insuffisant pour payer les frais de transaction.';
+
+/** Le site n'a pas l'autorisation d'envoyer pour ce compte (erreur 4100). */
+const UNAUTHORIZED_MESSAGE =
+  "Ce compte n'est pas autorisé par le site. Déconnectez puis reconnectez MetaMask en choisissant ce compte.";
+
+/** Le portefeuille n'est plus relié au réseau (erreurs 4900/4901). */
+const DISCONNECTED_MESSAGE =
+  "MetaMask n'est plus connecté au réseau. Reconnectez le portefeuille puis réessayez.";
+
+/** Nonce local du portefeuille désynchronisé de la chaîne (après un redémarrage du nœud). */
+const NONCE_MESSAGE =
+  'Le portefeuille est désynchronisé du réseau. Dans MetaMask : Réglages → Avancé → « Effacer les données d’activité », puis réessayez.';
+
 /** Chaînes require() des contrats, dans l'ordre de priorité. */
 const CONTRACT_MESSAGES = [
   ['Createur uniquement', 'Seul le créateur peut effectuer cette action.'],
@@ -76,7 +91,39 @@ export function mapContractError(error) {
   }
 
   if (code === 'INSUFFICIENT_FUNDS') {
-    return 'Solde insuffisant pour payer les frais de transaction.';
+    return INSUFFICIENT_FUNDS_MESSAGE;
+  }
+
+  if (/insufficient funds/i.test(raw)) {
+    return INSUFFICIENT_FUNDS_MESSAGE;
+  }
+
+  // Le site n'a pas l'autorisation d'envoyer pour ce compte : MetaMask refuse
+  // sans afficher de fenêtre de signature.
+  if (
+    code === 4100 ||
+    code === 'UNAUTHORIZED' ||
+    /not been authorized|not authorized|unauthorized|no accounts available/i.test(
+      raw,
+    )
+  ) {
+    return UNAUTHORIZED_MESSAGE;
+  }
+
+  if (
+    code === 4900 ||
+    code === 4901 ||
+    /is not connected|not connected to the network|disconnected from/i.test(raw)
+  ) {
+    return DISCONNECTED_MESSAGE;
+  }
+
+  if (
+    /nonce too (high|low)|nonce has already been used|replacement transaction underpriced|already known/i.test(
+      raw,
+    )
+  ) {
+    return NONCE_MESSAGE;
   }
 
   if (/Adresse de la fabrique introuvable/i.test(raw)) {
@@ -101,4 +148,11 @@ export function mapContractError(error) {
   return DEFAULT_MESSAGE;
 }
 
-export { MISSING_METAMASK_MESSAGE, WRONG_NETWORK_MESSAGE };
+export {
+  DISCONNECTED_MESSAGE,
+  INSUFFICIENT_FUNDS_MESSAGE,
+  MISSING_METAMASK_MESSAGE,
+  NONCE_MESSAGE,
+  UNAUTHORIZED_MESSAGE,
+  WRONG_NETWORK_MESSAGE,
+};

@@ -2,8 +2,11 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  DISCONNECTED_MESSAGE,
   mapContractError,
   MISSING_METAMASK_MESSAGE,
+  NONCE_MESSAGE,
+  UNAUTHORIZED_MESSAGE,
   WRONG_NETWORK_MESSAGE,
 } from './errors';
 
@@ -53,6 +56,38 @@ describe('mapContractError', () => {
     expect(mapContractError({ code: 'INSUFFICIENT_FUNDS' })).toBe(
       'Solde insuffisant pour payer les frais de transaction.',
     );
+    expect(
+      mapContractError({ message: 'insufficient funds for gas * price + value' }),
+    ).toBe('Solde insuffisant pour payer les frais de transaction.');
+  });
+
+  it('traduit un compte non autorisé par le site (4100)', () => {
+    expect(mapContractError({ code: 4100 })).toBe(UNAUTHORIZED_MESSAGE);
+    expect(
+      mapContractError({
+        info: {
+          error: {
+            code: 4100,
+            message: 'The requested account has not been authorized by the user.',
+          },
+        },
+      }),
+    ).toBe(UNAUTHORIZED_MESSAGE);
+  });
+
+  it('traduit un portefeuille déconnecté du réseau (4900/4901)', () => {
+    expect(mapContractError({ code: 4900 })).toBe(DISCONNECTED_MESSAGE);
+    expect(mapContractError({ code: 4901 })).toBe(DISCONNECTED_MESSAGE);
+  });
+
+  it('explique comment resynchroniser un nonce après un redémarrage', () => {
+    expect(
+      mapContractError({
+        code: -32603,
+        message:
+          'Nonce too high. Expected nonce to be 4 but got 5.',
+      }),
+    ).toBe(NONCE_MESSAGE);
   });
 
   it('traduit un RPC injoignable', () => {
