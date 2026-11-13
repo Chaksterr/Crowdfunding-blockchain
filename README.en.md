@@ -24,7 +24,7 @@
 
 <br><br>
 
-**[🎬 Demo video](#2-demo)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/rapport/rapport.tex)**
+**[🎬 Demo video](#2-demo)** · **[⚙️ Installation](#6-installation)** · **[📄 Report](docs/commun/documents/Rapport_Financement_Participatif.pdf)**
 
 **🌐 Language / Langue:** [Français](README.md) · English
 
@@ -174,7 +174,7 @@ Crowdfunding-blockchain/
 ├── docs/commun/
 │   ├── captures/              # screenshots
 │   ├── demo/                  # demo video
-│   └── rapport/               # project report (LaTeX, French)
+│   └── documents/             # project report and specification (PDF, French)
 ├── .github/workflows/ci.yml   # continuous integration
 └── hardhat.config.js          # Solidity 0.8.24, local network (31338)
 ```
